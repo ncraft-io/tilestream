@@ -1,0 +1,36 @@
+{
+    "title": "tilestream.Layer",
+    "description": "",
+    "type": "object",
+    "properties": {
+        "config": {
+            "$ref": "#/components/schemas/mojo.core.Object"
+        },
+        "createTime": {
+            "$ref": "#/components/schemas/mojo.core.Timestamp"
+        },
+        "description": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "id": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "name": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "templated": {
+            "title": "mojo.core.Bool",
+            "type": "boolean"
+        },
+        "type": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "updateTime": {
+            "$ref": "#/components/schemas/mojo.core.Timestamp"
+        }
+    }
+}

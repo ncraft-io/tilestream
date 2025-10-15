@@ -1,0 +1,35 @@
+{
+    "title": "tilestream.Tile",
+    "description": "",
+    "type": "object",
+    "properties": {
+        "content": {
+            "title": "mojo.core.Bytes",
+            "type": "string",
+            "format": "Bytes"
+        },
+        "encoding": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "format": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "level": {
+            "title": "mojo.core.Int32",
+            "type": "integer",
+            "format": "Int32"
+        },
+        "x": {
+            "title": "mojo.core.Int32",
+            "type": "integer",
+            "format": "Int32"
+        },
+        "y": {
+            "title": "mojo.core.Int32",
+            "type": "integer",
+            "format": "Int32"
+        }
+    }
+}

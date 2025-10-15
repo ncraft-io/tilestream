@@ -1,0 +1,71 @@
+tilestreams:
+  - name: mbtiles_sat
+    type: mbtiles
+    layer: post
+    paths:
+      - ./
+  - name: crowd
+    type: postgis
+    options:
+      debug: true
+      mapName: crowd
+      minZoom: 3
+      maxZoom: 18
+      bounds: [120.8523, 30.6917, 122.1183, 31.8747]
+      atlas:
+        providers:
+          name: crowd
+          type: postgis        # the type of data provider. currently only supports postgis
+          host: 124.70.220.172      # postgis database host
+          port: 5433            # postgis database port
+          database: tile       # postgis database name
+          user: postgres         # postgis database user
+          password: daju@2024!           # postgis database password
+          srid: 4326             # The default srid for this provider. If not provided it will be WebMercator (3857)
+          layers:
+            - name: grid
+              geometry_fieldname: geometry
+              id_fieldname: id
+              sql: SELECT ST_AsBinary(geometry) AS geometry, work, residential, id FROM crowd_grids WHERE geometry && !BBOX!
+            - name: point
+              geometry_fieldname: geometry
+              id_fieldname: id
+              sql: SELECT ST_AsBinary(geometry) AS geometry, work, residential, id FROM crowd_points WHERE geometry && !BBOX!
+        maps:
+          name: crowd
+          layers:
+            - provider_layer: crowd.grid
+              min_zoom: 3
+              max_zoom: 18
+            - provider_layer: crowd.point
+              min_zoom: 3
+              max_zoom: 18
+  - name: residence
+    type: postgis
+    options:
+      debug: true
+      mapName: residence
+      minZoom: 3
+      maxZoom: 18
+      bounds: [120.93079, 30.712686,121.941565, 31.767823]
+      atlas:
+        providers:
+          name: residence
+          type: postgis        # the type of data provider. currently only supports postgis
+          host: 124.70.220.172      # postgis database host
+          port: 5433            # postgis database port
+          database: xddigital       # postgis database name
+          user: postgres         # postgis database user
+          password: daju@2024!           # postgis database password
+          srid: 4326             # The default srid for this provider. If not provided it will be WebMercator (3857)
+          layers:
+            - name: residence
+              geometry_fieldname: geometry
+              id_fieldname: id
+              sql: SELECT ST_AsBinary(geometry) AS geometry, id, name, average_price, trace_count, rent_count FROM residence WHERE geometry && !BBOX!
+        maps:
+          name: residence
+          layers:
+            - provider_layer: residence.residence
+              min_zoom: 3
+              max_zoom: 18

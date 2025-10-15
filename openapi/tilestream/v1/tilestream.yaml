@@ -1,0 +1,721 @@
+components:
+  schemas:
+    mojo.core.Object:
+      description: Object type
+      title: mojo.core.Object
+      type: object
+    mojo.core.Timestamp:
+      description: ""
+      format: Timestamp
+      title: mojo.core.Timestamp
+      type: string
+    mojo.geom.BoundingBox:
+      description: ""
+      properties:
+        leftBottom:
+          $ref: '#/components/schemas/mojo.geom.LngLat'
+        rightTop:
+          $ref: '#/components/schemas/mojo.geom.LngLat'
+      title: mojo.geom.BoundingBox
+      type: object
+    mojo.geom.LngLat:
+      description: 经纬度
+      properties:
+        altitude:
+          description: |-
+            the altitude of the `LngLat` in meters.
+            高度
+          format: Float64
+          title: mojo.core.Float64
+          type: number
+        latitude:
+          description: |-
+            the latitude of the `LngLat`
+            维度
+          format: Float64
+          title: mojo.core.Float64
+          type: number
+        longitude:
+          description: |-
+            the longitude of the `LngLat`
+            经度
+          format: Float64
+          title: mojo.core.Float64
+          type: number
+      required:
+      - longitude
+      - latitude
+      title: mojo.geom.LngLat
+      type: object
+    tilestream.Layer:
+      description: ""
+      properties:
+        config:
+          $ref: '#/components/schemas/mojo.core.Object'
+        createTime:
+          $ref: '#/components/schemas/mojo.core.Timestamp'
+        description:
+          title: mojo.core.String
+          type: string
+        id:
+          title: mojo.core.String
+          type: string
+        name:
+          title: mojo.core.String
+          type: string
+        templated:
+          title: mojo.core.Bool
+          type: boolean
+        type:
+          title: mojo.core.String
+          type: string
+        updateTime:
+          $ref: '#/components/schemas/mojo.core.Timestamp'
+      title: tilestream.Layer
+      type: object
+    tilestream.PointTile:
+      description: for compressed pured point tile.
+      properties:
+        id:
+          description: tile quad-key
+          title: mojo.core.String
+          type: string
+        ids:
+          description: for string ids, using keys or md5(string id)
+          items:
+            format: UInt64
+            title: mojo.core.UInt64
+            type: integer
+          title: mojo.core.Array
+          type: array
+        keys:
+          description: Dictionary encoding for keys
+          items:
+            title: mojo.core.String
+            type: string
+          title: mojo.core.Array
+          type: array
+        rawValues:
+          description: attribute index for which value is raw integer
+          items:
+            format: Int32
+            title: mojo.core.Int32
+            type: integer
+          title: mojo.core.Array
+          type: array
+        tags:
+          description: |-
+            Tags of this feature are encoded as repeated pairs of
+            integers.
+          items:
+            format: UInt32
+            title: mojo.core.UInt32
+            type: integer
+          title: mojo.core.Array
+          type: array
+        type:
+          description: |-
+            the point data type
+            the user defined point data type
+          title: mojo.core.String
+          type: string
+        values:
+          description: Dictionary encoding for values
+          items:
+            $ref: '#/components/schemas/tilestream.VectorTile.Value'
+          title: mojo.core.Array
+          type: array
+        version:
+          description: the version of the point tile specification
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+        xs:
+          description: the coordinates for the point, using E7 of the latitude & longitude
+          items:
+            format: Int32
+            title: mojo.core.Int32
+            type: integer
+          title: mojo.core.Array
+          type: array
+        ys:
+          items:
+            format: Int32
+            title: mojo.core.Int32
+            type: integer
+          title: mojo.core.Array
+          type: array
+      title: tilestream.PointTile
+      type: object
+    tilestream.Tile:
+      description: ""
+      properties:
+        content:
+          format: Bytes
+          title: mojo.core.Bytes
+          type: string
+        encoding:
+          title: mojo.core.String
+          type: string
+        format:
+          title: mojo.core.String
+          type: string
+        level:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+        x:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+        "y":
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      title: tilestream.Tile
+      type: object
+    tilestream.TileId:
+      description: ""
+      properties:
+        level:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+        x:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+        "y":
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      title: tilestream.TileId
+      type: object
+    tilestream.TileInfo:
+      description: ""
+      properties:
+        attribution:
+          title: mojo.core.String
+          type: string
+        bounds:
+          $ref: '#/components/schemas/mojo.geom.BoundingBox'
+        center:
+          $ref: '#/components/schemas/mojo.geom.LngLat'
+        description:
+          title: mojo.core.String
+          type: string
+        format:
+          title: mojo.core.String
+          type: string
+        id:
+          title: mojo.core.String
+          type: string
+        maxZoom:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+        minZoom:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+        name:
+          title: mojo.core.String
+          type: string
+        scheme:
+          description: tms, xyz
+          title: mojo.core.String
+          type: string
+        type:
+          title: mojo.core.String
+          type: string
+        version:
+          title: mojo.core.String
+          type: string
+      title: tilestream.TileInfo
+      type: object
+    tilestream.VectorTile:
+      description: '[Vector Tile Specification v2.1](https://github.com/mapbox/vector-tile-spec/tree/master/2.1)'
+      properties:
+        layers:
+          items:
+            $ref: '#/components/schemas/tilestream.VectorTile.Layer'
+          title: mojo.core.Array
+          type: array
+      title: tilestream.VectorTile
+      type: object
+    tilestream.VectorTile.Feature:
+      description: ""
+      properties:
+        geometry:
+          items:
+            format: UInt32
+            title: mojo.core.UInt32
+            type: integer
+          title: mojo.core.Array
+          type: array
+        id:
+          format: UInt64
+          title: mojo.core.UInt64
+          type: integer
+        tags:
+          items:
+            format: UInt32
+            title: mojo.core.UInt32
+            type: integer
+          title: mojo.core.Array
+          type: array
+        type:
+          enum:
+          - UNKNOWN
+          - POINT
+          - LINESTRING
+          - POLYGON
+          title: tilestream.VectorTile.GeomType
+          type: string
+      title: tilestream.VectorTile.Feature
+      type: object
+    tilestream.VectorTile.Layer:
+      description: ""
+      properties:
+        extent:
+          format: UInt32
+          title: mojo.core.UInt32
+          type: integer
+        features:
+          items:
+            $ref: '#/components/schemas/tilestream.VectorTile.Feature'
+          title: mojo.core.Array
+          type: array
+        keys:
+          items:
+            title: mojo.core.String
+            type: string
+          title: mojo.core.Array
+          type: array
+        name:
+          title: mojo.core.String
+          type: string
+        values:
+          items:
+            $ref: '#/components/schemas/tilestream.VectorTile.Value'
+          title: mojo.core.Array
+          type: array
+        version:
+          format: UInt32
+          title: mojo.core.UInt32
+          type: integer
+      required:
+      - version
+      - name
+      title: tilestream.VectorTile.Layer
+      type: object
+    tilestream.VectorTile.Value:
+      description: ""
+      properties:
+        boolValue:
+          title: mojo.core.Bool
+          type: boolean
+        doubleValue:
+          format: Float64
+          title: mojo.core.Float64
+          type: number
+        floatValue:
+          format: Float32
+          title: mojo.core.Float32
+          type: number
+        intValue:
+          format: Int64
+          title: mojo.core.Int64
+          type: integer
+        sintValue:
+          format: Int64
+          title: mojo.core.Int64
+          type: integer
+        stringValue:
+          title: mojo.core.String
+          type: string
+        uintValue:
+          format: UInt64
+          title: mojo.core.UInt64
+          type: integer
+      title: tilestream.VectorTile.Value
+      type: object
+info:
+  description: ""
+  title: Tilestream service
+  version: 0.1.0
+openapi: 3.0.3
+paths:
+  /tilestream/v1/layers:
+    get:
+      description: ""
+      operationId: list_layers
+      parameters:
+      - description: prefix of layer name
+        in: query
+        name: prefix
+        schema:
+          title: mojo.core.String
+          type: string
+      - description: show config of layer, hide layer config in most cases
+        in: query
+        name: show_config
+        schema:
+          title: mojo.core.Bool
+          type: boolean
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/tilestream.Layer'
+                title: mojo.core.Array
+                type: array
+          description: OK
+    post:
+      description: ""
+      operationId: create_layer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tilestream.Layer'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tilestream.Layer'
+          description: OK
+  /tilestream/v1/layers/{id}:
+    put:
+      description: ""
+      operationId: update_layer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          title: mojo.core.String
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tilestream.Layer'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /tilestream/v1/layers/{layer}:
+    delete:
+      description: ""
+      operationId: delete_layer
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      responses:
+        "200":
+          description: OK
+    get:
+      description: ""
+      operationId: get_layer
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tilestream.Layer'
+          description: OK
+  /tilestream/v1/layers/{layer}/tile_info:
+    get:
+      description: ""
+      operationId: get_tile_info
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tilestream.TileInfo'
+          description: OK
+    put:
+      description: ""
+      operationId: update_tile_info
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tilestream.TileInfo'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /tilestream/v1/layers/{layer}/tiles:
+    post:
+      description: ""
+      operationId: batch_create_tiles
+      responses:
+        "200":
+          description: OK
+  /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}:
+    get:
+      description: ""
+      operationId: get_tile
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      - in: path
+        name: level
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: x
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: "y"
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: format
+        schema:
+          title: mojo.core.String
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tilestream.Tile'
+          description: OK
+    post:
+      description: ""
+      operationId: create_tile
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      - in: path
+        name: level
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: x
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: "y"
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: format
+        schema:
+          title: mojo.core.String
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tilestream.Tile'
+          description: OK
+    put:
+      description: ""
+      operationId: update_tile
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      - in: path
+        name: level
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: x
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: "y"
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: format
+        schema:
+          title: mojo.core.String
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tilestream.Tile'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}:
+    get:
+      description: ""
+      operationId: get_tile
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      - in: path
+        name: level
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: x
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: "y"
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: format
+        schema:
+          title: mojo.core.String
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tilestream.Tile'
+          description: OK
+    post:
+      description: ""
+      operationId: create_tile
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      - in: path
+        name: level
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: x
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: "y"
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: format
+        schema:
+          title: mojo.core.String
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tilestream.Tile'
+          description: OK
+    put:
+      description: ""
+      operationId: update_tile
+      parameters:
+      - in: path
+        name: layer
+        schema:
+          title: mojo.core.String
+          type: string
+      - in: path
+        name: level
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: x
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: "y"
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - in: path
+        name: format
+        schema:
+          title: mojo.core.String
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tilestream.Tile'
+        required: true
+      responses:
+        "200":
+          description: OK

@@ -1,0 +1,56 @@
+{
+    "title": "tilestream.TileInfo",
+    "description": "",
+    "type": "object",
+    "properties": {
+        "attribution": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "bounds": {
+            "$ref": "#/components/schemas/mojo.geom.BoundingBox"
+        },
+        "center": {
+            "$ref": "#/components/schemas/mojo.geom.LngLat"
+        },
+        "description": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "format": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "id": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "maxZoom": {
+            "title": "mojo.core.Int32",
+            "type": "integer",
+            "format": "Int32"
+        },
+        "minZoom": {
+            "title": "mojo.core.Int32",
+            "type": "integer",
+            "format": "Int32"
+        },
+        "name": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "scheme": {
+            "title": "mojo.core.String",
+            "description": "tms, xyz",
+            "type": "string"
+        },
+        "type": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "version": {
+            "title": "mojo.core.String",
+            "type": "string"
+        }
+    }
+}
