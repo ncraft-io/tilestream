@@ -43,7 +43,13 @@ GET /tilestream/v1/layers
 | 参数名 | 参数类型 | 格式类型 | 是否必须 | 默认值 | 说明 |
 |---|---|---|---|---|---|
 | `prefix` | `string` |  | 否 |  | prefix of layer name |
-| `show_config` | `boolean` |  | 否 |  | show config of layer, hide layer config in most cases |
+| `page_size` | `integer` | `Int32` | 否 |  | the page size for pagination request |
+| `page_token` | `string` |  | 否 |  | the page token for pagination request, usually like "1", "2" ... |
+| `skip` | `integer` | `Int32` | 否 |  | skip the first items count for the request |
+| `filter` | `string` |  | 否 |  | the mojo expression for DB query |
+| `order` | `mojo.core.Ordering` |  | 否 |  | setting the order field for result, like "name desc" |
+| `field_mask` | `string` | `FieldMask` | 否 |  | control the fields which need to be retrieved |
+| `unique` | `boolean` |  | 否 |  | make the fields which returns are unique, equals to "SELECT DISTINCT" in sql |
 
 
 ### 返回值
@@ -63,6 +69,7 @@ GET /tilestream/v1/layers
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
 
@@ -86,6 +93,7 @@ POST /tilestream/v1/layers
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
 
@@ -101,6 +109,7 @@ POST /tilestream/v1/layers
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
 
@@ -130,6 +139,7 @@ PUT /tilestream/v1/layers/{id}
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
 
@@ -166,6 +176,7 @@ GET /tilestream/v1/layers/{layer}
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
 
@@ -237,7 +248,7 @@ GET /tilestream/v1/layers/{layer}/tile_info
 | field | type | format | required | default | description |
 |---|---|---|---|---|---|
 | `longitude` | `number` | `Float64` | Y |  | the longitude of the `LngLat`经度 |
-| `latitude` | `number` | `Float64` | Y |  | the latitude of the `LngLat`维度 |
+| `latitude` | `number` | `Float64` | Y |  | the latitude of the `LngLat`纬度 |
 | `altitude` | `number` | `Float64` | N |  | the altitude of the `LngLat` in meters.高度 |
 
 
@@ -285,7 +296,7 @@ PUT /tilestream/v1/layers/{layer}/tile_info
 | field | type | format | required | default | description |
 |---|---|---|---|---|---|
 | `longitude` | `number` | `Float64` | Y |  | the longitude of the `LngLat`经度 |
-| `latitude` | `number` | `Float64` | Y |  | the latitude of the `LngLat`维度 |
+| `latitude` | `number` | `Float64` | Y |  | the latitude of the `LngLat`纬度 |
 | `altitude` | `number` | `Float64` | N |  | the altitude of the `LngLat` in meters.高度 |
 
 
@@ -326,7 +337,12 @@ GET /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}
 | `level` | `integer` | `Int32` |  |
 | `x` | `integer` | `Int32` |  |
 | `y` | `integer` | `Int32` |  |
-| `format` | `string` |  |  |
+
+
+#### Query 参数
+| 参数名 | 参数类型 | 格式类型 | 是否必须 | 默认值 | 说明 |
+|---|---|---|---|---|---|
+| `format` | `string` |  | 否 |  |  |
 
 
 ### 返回值
@@ -359,7 +375,12 @@ PUT /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}
 | `level` | `integer` | `Int32` |  |
 | `x` | `integer` | `Int32` |  |
 | `y` | `integer` | `Int32` |  |
-| `format` | `string` |  |  |
+
+
+#### Query 参数
+| 参数名 | 参数类型 | 格式类型 | 是否必须 | 默认值 | 说明 |
+|---|---|---|---|---|---|
+| `format` | `string` |  | 否 |  |  |
 
 
 #### Body 请求对象
@@ -395,7 +416,12 @@ POST /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}
 | `level` | `integer` | `Int32` |  |
 | `x` | `integer` | `Int32` |  |
 | `y` | `integer` | `Int32` |  |
-| `format` | `string` |  |  |
+
+
+#### Query 参数
+| 参数名 | 参数类型 | 格式类型 | 是否必须 | 默认值 | 说明 |
+|---|---|---|---|---|---|
+| `format` | `string` |  | 否 |  |  |
 
 
 ### 返回值
@@ -415,64 +441,68 @@ POST /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}
 
 ### 请求路径
 ```http
-GET /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}
+GET /tilestream/v1/layers:batch
 ```
 
 
 ### 请求参数
 
-#### Path 参数
-| 参数名 | 参数类型 | 格式类型 | 说明 |
-|---|---|---|---|
-| `layer` | `string` |  |  |
-| `level` | `integer` | `Int32` |  |
-| `x` | `integer` | `Int32` |  |
-| `y` | `integer` | `Int32` |  |
-| `format` | `string` |  |  |
+#### Query 参数
+| 参数名 | 参数类型 | 格式类型 | 是否必须 | 默认值 | 说明 |
+|---|---|---|---|---|---|
+| `layers` | `Array<string>` |  | 否 |  |  |
 
 
 ### 返回值
 
 #### 返回对象
+| type | description |
+|---|---|
+| `Array<tilestream.Layer>` |  |
+
+
+#### `tilestream.Layer`
 | field | type | format | required | default | description |
 |---|---|---|---|---|---|
-| `x` | `integer` | `Int32` | N |  |
-| `y` | `integer` | `Int32` | N |  |
-| `level` | `integer` | `Int32` | N |  |
-| `format` | `string` |  | N |  |
-| `encoding` | `string` |  | N |  |
-| `content` | `string` | `Bytes` | N |  |
+| `id` | `string` |  | N |  |
+| `name` | `string` |  | N |  |
+| `type` | `string` |  | N |  |
+| `templated` | `boolean` |  | N |  |
+| `config` | `mojo.core.Object` |  | N |  | Object type |
+| `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
+| `createTime` | `string` | `Timestamp` | N |  |  |
+| `updateTime` | `string` | `Timestamp` | N |  |  |
 
 
 ## 
 
 ### 请求路径
 ```http
-PUT /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}
+PUT /tilestream/v1/layers:batch
 ```
 
 
 ### 请求参数
-
-#### Path 参数
-| 参数名 | 参数类型 | 格式类型 | 说明 |
-|---|---|---|---|
-| `layer` | `string` |  |  |
-| `level` | `integer` | `Int32` |  |
-| `x` | `integer` | `Int32` |  |
-| `y` | `integer` | `Int32` |  |
-| `format` | `string` |  |  |
-
 
 #### Body 请求对象
+| type | description |
+|---|---|
+| `Array<tilestream.Layer>` |  |
+
+
+#### `tilestream.Layer`
 | field | type | format | required | default | description |
 |---|---|---|---|---|---|
-| `x` | `integer` | `Int32` | N |  |
-| `y` | `integer` | `Int32` | N |  |
-| `level` | `integer` | `Int32` | N |  |
-| `format` | `string` |  | N |  |
-| `encoding` | `string` |  | N |  |
-| `content` | `string` | `Bytes` | N |  |
+| `id` | `string` |  | N |  |
+| `name` | `string` |  | N |  |
+| `type` | `string` |  | N |  |
+| `templated` | `boolean` |  | N |  |
+| `config` | `mojo.core.Object` |  | N |  | Object type |
+| `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
+| `createTime` | `string` | `Timestamp` | N |  |  |
+| `updateTime` | `string` | `Timestamp` | N |  |  |
 
 
 ### 返回值
@@ -484,30 +514,49 @@ PUT /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}
 
 ### 请求路径
 ```http
-POST /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}
+POST /tilestream/v1/layers:batch
 ```
 
 
 ### 请求参数
 
-#### Path 参数
-| 参数名 | 参数类型 | 格式类型 | 说明 |
-|---|---|---|---|
-| `layer` | `string` |  |  |
-| `level` | `integer` | `Int32` |  |
-| `x` | `integer` | `Int32` |  |
-| `y` | `integer` | `Int32` |  |
-| `format` | `string` |  |  |
+#### Body 请求对象
+| type | description |
+|---|---|
+| `Array<tilestream.Layer>` |  |
+
+
+#### `tilestream.Layer`
+| field | type | format | required | default | description |
+|---|---|---|---|---|---|
+| `id` | `string` |  | N |  |
+| `name` | `string` |  | N |  |
+| `type` | `string` |  | N |  |
+| `templated` | `boolean` |  | N |  |
+| `config` | `mojo.core.Object` |  | N |  | Object type |
+| `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
+| `createTime` | `string` | `Timestamp` | N |  |  |
+| `updateTime` | `string` | `Timestamp` | N |  |  |
 
 
 ### 返回值
 
 #### 返回对象
+| type | description |
+|---|---|
+| `Array<tilestream.Layer>` |  |
+
+
+#### `tilestream.Layer`
 | field | type | format | required | default | description |
 |---|---|---|---|---|---|
-| `x` | `integer` | `Int32` | N |  |
-| `y` | `integer` | `Int32` | N |  |
-| `level` | `integer` | `Int32` | N |  |
-| `format` | `string` |  | N |  |
-| `encoding` | `string` |  | N |  |
-| `content` | `string` | `Bytes` | N |  |
+| `id` | `string` |  | N |  |
+| `name` | `string` |  | N |  |
+| `type` | `string` |  | N |  |
+| `templated` | `boolean` |  | N |  |
+| `config` | `mojo.core.Object` |  | N |  | Object type |
+| `description` | `string` |  | N |  |
+| `originalId` | `string` |  | N |  | copied layer from original layer id |
+| `createTime` | `string` | `Timestamp` | N |  |  |
+| `updateTime` | `string` | `Timestamp` | N |  |  |

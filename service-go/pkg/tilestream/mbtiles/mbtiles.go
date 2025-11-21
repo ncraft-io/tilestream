@@ -2,7 +2,7 @@ package mbtiles
 
 import (
 	"context"
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 	"github.com/ncraft-io/tilestream/go/pkg/tilestream"
 	ts "github.com/ncraft-io/tilestream/service-go/pkg/tilestream"
 	"path"

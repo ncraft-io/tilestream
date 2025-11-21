@@ -1,7 +1,7 @@
 package pgsql
 
 import (
-	"github.com/mojo-lang/db/go/pkg/mojo/db"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/db"
 )
 
 type TileStream struct {

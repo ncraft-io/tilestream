@@ -2,8 +2,9 @@ package tilestream
 
 import (
 	"context"
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/config"
+	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
 	"github.com/ncraft-io/tilestream/service-go/pkg/model"
 	"sync"
 )
@@ -22,10 +23,18 @@ type TileStream interface {
 	TileWriter
 }
 
+var Conf *Config
+
 func init() {
 	readers = make(map[string]func(options core.Options) TileReader)
 	writers = make(map[string]func(options core.Options) TileWriter)
 	tileStreams = make(map[string]func(options core.Options) TileStream)
+
+	var conf Config
+	if err = config.ScanFrom(&conf, "tilestreams"); err != nil {
+		logs.ErrLogw("failed to load the tile stream config", "error", err)
+	}
+	Conf = &conf
 }
 
 // RegisterReader register a reader function to process a command
@@ -93,11 +102,9 @@ func LoadTileStream(name string, options core.Options) TileStream {
 }
 
 func NewTileStream(name string) TileStream {
-	var confs []*Config
-	_ = config.ScanFrom(&confs, "tilestreams")
-	for _, conf := range confs {
-		if conf.Name == name {
-			return LoadTileStream(conf.Type, conf.Options)
+	for _, layer := range Conf.Layers {
+		if layer.Name == name {
+			return LoadTileStream(layer.Type, layer.Options)
 		}
 	}
 

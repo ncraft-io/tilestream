@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/ghodss/yaml"
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/kvstore"
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
 	ts "github.com/ncraft-io/tilestream/go/pkg/tilestream"

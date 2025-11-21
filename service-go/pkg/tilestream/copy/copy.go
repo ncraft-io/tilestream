@@ -2,7 +2,7 @@ package copy
 
 import (
 	"context"
-	"github.com/mojo-lang/geom/go/pkg/mojo/geom"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/geom"
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
 	ts "github.com/ncraft-io/tilestream/service-go/pkg/tilestream"
 )

@@ -19,7 +19,7 @@ import (
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 	stdopentracing "github.com/opentracing/opentracing-go"
 
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 	"github.com/ncraft-io/tilestream/go/pkg/tilestream"
 
 	// this service api
@@ -31,6 +31,8 @@ var (
 	_ = core.Null{}
 	_ = tilestream.TileInfo{}
 	_ = tilestream.Layer{}
+	_ = core.Ordering{}
+	_ = core.FieldMask{}
 )
 
 // MakeGRPCServer makes a set of endpoints available as a gRPC TilestreamServer.
@@ -106,12 +108,26 @@ func MakeGRPCServer(endpoints Endpoints, tracer stdopentracing.Tracer, logger lo
 			addTracerOption("create_layer")...,
 		//append(serverOptions, grpctransport.ServerBefore(opentracing.GRPCToContext(tracer, "create_layer", logger)))...,
 		),
+		batchCreateLayer: grpctransport.NewServer(
+			endpoints.BatchCreateLayerEndpoint,
+			DecodeGRPCBatchCreateLayerRequest,
+			EncodeGRPCBatchCreateLayerResponse,
+			addTracerOption("batch_create_layer")...,
+		//append(serverOptions, grpctransport.ServerBefore(opentracing.GRPCToContext(tracer, "batch_create_layer", logger)))...,
+		),
 		updateLayer: grpctransport.NewServer(
 			endpoints.UpdateLayerEndpoint,
 			DecodeGRPCUpdateLayerRequest,
 			EncodeGRPCUpdateLayerResponse,
 			addTracerOption("update_layer")...,
 		//append(serverOptions, grpctransport.ServerBefore(opentracing.GRPCToContext(tracer, "update_layer", logger)))...,
+		),
+		batchUpdateLayer: grpctransport.NewServer(
+			endpoints.BatchUpdateLayerEndpoint,
+			DecodeGRPCBatchUpdateLayerRequest,
+			EncodeGRPCBatchUpdateLayerResponse,
+			addTracerOption("batch_update_layer")...,
+		//append(serverOptions, grpctransport.ServerBefore(opentracing.GRPCToContext(tracer, "batch_update_layer", logger)))...,
 		),
 		deleteLayer: grpctransport.NewServer(
 			endpoints.DeleteLayerEndpoint,
@@ -126,6 +142,13 @@ func MakeGRPCServer(endpoints Endpoints, tracer stdopentracing.Tracer, logger lo
 			EncodeGRPCGetLayerResponse,
 			addTracerOption("get_layer")...,
 		//append(serverOptions, grpctransport.ServerBefore(opentracing.GRPCToContext(tracer, "get_layer", logger)))...,
+		),
+		batchGetLayers: grpctransport.NewServer(
+			endpoints.BatchGetLayersEndpoint,
+			DecodeGRPCBatchGetLayersRequest,
+			EncodeGRPCBatchGetLayersResponse,
+			addTracerOption("batch_get_layers")...,
+		//append(serverOptions, grpctransport.ServerBefore(opentracing.GRPCToContext(tracer, "batch_get_layers", logger)))...,
 		),
 		listLayers: grpctransport.NewServer(
 			endpoints.ListLayersEndpoint,
@@ -149,9 +172,12 @@ type grpcServer struct {
 	updateTile       grpctransport.Handler
 	updateTileInfo   grpctransport.Handler
 	createLayer      grpctransport.Handler
+	batchCreateLayer grpctransport.Handler
 	updateLayer      grpctransport.Handler
+	batchUpdateLayer grpctransport.Handler
 	deleteLayer      grpctransport.Handler
 	getLayer         grpctransport.Handler
+	batchGetLayers   grpctransport.Handler
 	listLayers       grpctransport.Handler
 }
 
@@ -221,8 +247,24 @@ func (s *grpcServer) CreateLayer(ctx context.Context, req *pb.CreateLayerRequest
 	return rep.(*tilestream.Layer), nil
 }
 
+func (s *grpcServer) BatchCreateLayer(ctx context.Context, req *pb.BatchCreateLayerRequest) (*pb.BatchCreateLayerResponse, error) {
+	_, rep, err := s.batchCreateLayer.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*pb.BatchCreateLayerResponse), nil
+}
+
 func (s *grpcServer) UpdateLayer(ctx context.Context, req *pb.UpdateLayerRequest) (*core.Null, error) {
 	_, rep, err := s.updateLayer.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*core.Null), nil
+}
+
+func (s *grpcServer) BatchUpdateLayer(ctx context.Context, req *pb.BatchUpdateLayerRequest) (*core.Null, error) {
+	_, rep, err := s.batchUpdateLayer.ServeGRPC(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -243,6 +285,14 @@ func (s *grpcServer) GetLayer(ctx context.Context, req *pb.GetLayerRequest) (*ti
 		return nil, err
 	}
 	return rep.(*tilestream.Layer), nil
+}
+
+func (s *grpcServer) BatchGetLayers(ctx context.Context, req *pb.BatchGetLayersRequest) (*pb.BatchGetLayersResponse, error) {
+	_, rep, err := s.batchGetLayers.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*pb.BatchGetLayersResponse), nil
 }
 
 func (s *grpcServer) ListLayers(ctx context.Context, req *pb.ListLayersRequest) (*pb.ListLayersResponse, error) {
@@ -311,10 +361,24 @@ func DecodeGRPCCreateLayerRequest(_ context.Context, grpcReq interface{}) (inter
 	return req, nil
 }
 
+// DecodeGRPCBatchCreateLayerRequest is a transport/grpc.DecodeRequestFunc that converts a
+// gRPC BatchCreateLayer request to a user-domain BatchCreateLayer request. Primarily useful in a server.
+func DecodeGRPCBatchCreateLayerRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*pb.BatchCreateLayerRequest)
+	return req, nil
+}
+
 // DecodeGRPCUpdateLayerRequest is a transport/grpc.DecodeRequestFunc that converts a
 // gRPC UpdateLayer request to a user-domain UpdateLayer request. Primarily useful in a server.
 func DecodeGRPCUpdateLayerRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*pb.UpdateLayerRequest)
+	return req, nil
+}
+
+// DecodeGRPCBatchUpdateLayerRequest is a transport/grpc.DecodeRequestFunc that converts a
+// gRPC BatchUpdateLayer request to a user-domain BatchUpdateLayer request. Primarily useful in a server.
+func DecodeGRPCBatchUpdateLayerRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*pb.BatchUpdateLayerRequest)
 	return req, nil
 }
 
@@ -329,6 +393,13 @@ func DecodeGRPCDeleteLayerRequest(_ context.Context, grpcReq interface{}) (inter
 // gRPC GetLayer request to a user-domain GetLayer request. Primarily useful in a server.
 func DecodeGRPCGetLayerRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*pb.GetLayerRequest)
+	return req, nil
+}
+
+// DecodeGRPCBatchGetLayersRequest is a transport/grpc.DecodeRequestFunc that converts a
+// gRPC BatchGetLayers request to a user-domain BatchGetLayers request. Primarily useful in a server.
+func DecodeGRPCBatchGetLayersRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*pb.BatchGetLayersRequest)
 	return req, nil
 }
 
@@ -397,9 +468,23 @@ func EncodeGRPCCreateLayerResponse(_ context.Context, response interface{}) (int
 	return resp, nil
 }
 
+// EncodeGRPCBatchCreateLayerResponse is a transport/grpc.EncodeResponseFunc that converts a
+// user-domain BatchCreateLayer response to a gRPC BatchCreateLayer reply. Primarily useful in a server.
+func EncodeGRPCBatchCreateLayerResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(*pb.BatchCreateLayerResponse)
+	return resp, nil
+}
+
 // EncodeGRPCUpdateLayerResponse is a transport/grpc.EncodeResponseFunc that converts a
 // user-domain UpdateLayer response to a gRPC UpdateLayer reply. Primarily useful in a server.
 func EncodeGRPCUpdateLayerResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(*core.Null)
+	return resp, nil
+}
+
+// EncodeGRPCBatchUpdateLayerResponse is a transport/grpc.EncodeResponseFunc that converts a
+// user-domain BatchUpdateLayer response to a gRPC BatchUpdateLayer reply. Primarily useful in a server.
+func EncodeGRPCBatchUpdateLayerResponse(_ context.Context, response interface{}) (interface{}, error) {
 	resp := response.(*core.Null)
 	return resp, nil
 }
@@ -415,6 +500,13 @@ func EncodeGRPCDeleteLayerResponse(_ context.Context, response interface{}) (int
 // user-domain GetLayer response to a gRPC GetLayer reply. Primarily useful in a server.
 func EncodeGRPCGetLayerResponse(_ context.Context, response interface{}) (interface{}, error) {
 	resp := response.(*tilestream.Layer)
+	return resp, nil
+}
+
+// EncodeGRPCBatchGetLayersResponse is a transport/grpc.EncodeResponseFunc that converts a
+// user-domain BatchGetLayers response to a gRPC BatchGetLayers reply. Primarily useful in a server.
+func EncodeGRPCBatchGetLayersResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(*pb.BatchGetLayersResponse)
 	return resp, nil
 }
 

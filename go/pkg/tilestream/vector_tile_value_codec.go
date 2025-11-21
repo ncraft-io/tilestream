@@ -3,7 +3,7 @@ package tilestream
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 	"math"
 )
 

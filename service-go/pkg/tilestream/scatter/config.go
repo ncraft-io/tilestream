@@ -1,7 +1,7 @@
 package scatter
 
 import (
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 )
 
 type Config struct {

@@ -4,7 +4,9 @@ syntax = "proto3";
 
 package tilestream.v1;
 
+import "mojo/core/field_mask.proto";
 import "mojo/core/null.proto";
+import "mojo/core/ordering.proto";
 import "mojo/mojo.proto";
 import "tilestream/layer.proto";
 import "tilestream/tile.proto";
@@ -61,9 +63,21 @@ message CreateLayerRequest {
     tilestream.Layer layer = 1;
 }
 
+message BatchCreateLayerRequest {
+    repeated tilestream.Layer layers = 2;
+}
+
+message BatchCreateLayerResponse {
+    repeated tilestream.Layer layers = 1;
+}
+
 message UpdateLayerRequest {
     string id = 1;
     tilestream.Layer layer = 2;
+}
+
+message BatchUpdateLayerRequest {
+    repeated tilestream.Layer layers = 2;
 }
 
 message DeleteLayerRequest {
@@ -74,13 +88,29 @@ message GetLayerRequest {
     string layer = 1;
 }
 
+message BatchGetLayersRequest {
+    repeated string layers = 1;
+}
+
+message BatchGetLayersResponse {
+    repeated tilestream.Layer layers = 1;
+}
+
 message ListLayersRequest {
     string prefix = 1;
-    bool show_config = 2;
+    int32 page_size = 2000;
+    string page_token = 2001;
+    int32 skip = 2002;
+    string filter = 2011;
+    mojo.core.Ordering order = 2012;
+    mojo.core.FieldMask field_mask = 2013;
+    bool unique = 2014;
 }
 
 message ListLayersResponse {
     repeated tilestream.Layer layers = 1;
+    int32 total_count = 2000;
+    string next_page_token = 2001;
 }
 
 service Tilestream {
@@ -92,8 +122,11 @@ service Tilestream {
     rpc update_tile(UpdateTileRequest) returns (mojo.core.Null);
     rpc update_tile_info(UpdateTileInfoRequest) returns (mojo.core.Null);
     rpc create_layer(CreateLayerRequest) returns (tilestream.Layer);
+    rpc batch_create_layer(BatchCreateLayerRequest) returns (BatchCreateLayerResponse);
     rpc update_layer(UpdateLayerRequest) returns (mojo.core.Null);
+    rpc batch_update_layer(BatchUpdateLayerRequest) returns (mojo.core.Null);
     rpc delete_layer(DeleteLayerRequest) returns (mojo.core.Null);
     rpc get_layer(GetLayerRequest) returns (tilestream.Layer);
+    rpc batch_get_layers(BatchGetLayersRequest) returns (BatchGetLayersResponse);
     rpc list_layers(ListLayersRequest) returns (ListLayersResponse);
 }

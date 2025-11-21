@@ -2,8 +2,8 @@ package model
 
 import (
 	"context"
-	"github.com/mojo-lang/db/go/pkg/mojo/db"
-	"github.com/mojo-lang/db/go/pkg/mojo/db/query"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/db"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/db/query"
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
 	"github.com/ncraft-io/tilestream/go/pkg/tilestream"
 	"gorm.io/gorm"
@@ -45,9 +45,8 @@ func (a *Layer) Create(ctx context.Context, tables ...*tilestream.Layer) (int64,
 		return 0, nil
 	} else if tablesLen == 1 {
 		executionResult = a.DB.WithContext(ctx).Clauses(clause.OnConflict{UpdateAll: true}).Create(tables[0])
-		//executionResult = a.DB.WithContext(ctx).Create(tables[0])
 	} else {
-		executionResult = a.DB.WithContext(ctx).CreateInBatches(tables, len(tables))
+		executionResult = a.DB.WithContext(ctx).Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(tables, len(tables))
 	}
 
 	return executionResult.RowsAffected, executionResult.Error
@@ -60,7 +59,7 @@ func (a *Layer) Update(ctx context.Context, table *tilestream.Layer) (int64, err
 
 func (a *Layer) Get(ctx context.Context, uid string) (*tilestream.Layer, error) {
 	table := &tilestream.Layer{}
-	return table, a.DB.WithContext(ctx).First(table, "id = ? or name = ?", uid, uid).Error
+	return table, a.DB.WithContext(ctx).First(table, "id = ? or (name = ? and original_id = '')", uid, uid).Error
 }
 
 func (a *Layer) BatchGet(ctx context.Context, ids []string) ([]*tilestream.Layer, error) {

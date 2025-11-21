@@ -1,8 +1,16 @@
 components:
   schemas:
+    mojo.core.FieldMask:
+      description: ""
+      format: FieldMask
+      title: mojo.core.FieldMask
+      type: string
     mojo.core.Object:
       description: Object type
       title: mojo.core.Object
+      type: object
+    mojo.core.Ordering:
+      title: mojo.core.Ordering
       type: object
     mojo.core.Timestamp:
       description: ""
@@ -31,7 +39,7 @@ components:
         latitude:
           description: |-
             the latitude of the `LngLat`
-            维度
+            纬度
           format: Float64
           title: mojo.core.Float64
           type: number
@@ -61,6 +69,10 @@ components:
           title: mojo.core.String
           type: string
         name:
+          title: mojo.core.String
+          type: string
+        originalId:
+          description: copied layer from original layer id
           title: mojo.core.String
           type: string
         templated:
@@ -340,6 +352,76 @@ components:
           type: integer
       title: tilestream.VectorTile.Value
       type: object
+    tilestream.providers.postgis.Config:
+      description: ""
+      properties:
+        bounds:
+          $ref: '#/components/schemas/mojo.geom.BoundingBox'
+        debug:
+          title: mojo.core.Bool
+          type: boolean
+        maxZoom:
+          format: Int64
+          title: mojo.core.Int64
+          type: integer
+        minZoom:
+          format: Int64
+          title: mojo.core.Int64
+          type: integer
+        name:
+          title: mojo.core.String
+          type: string
+        provider:
+          $ref: '#/components/schemas/tilestream.providers.postgis.Config.Provider'
+        tileBuffer:
+          format: Int64
+          title: mojo.core.Int64
+          type: integer
+      title: tilestream.providers.postgis.Config
+      type: object
+    tilestream.providers.postgis.Config.Provider:
+      description: ""
+      properties:
+        geometryField:
+          title: mojo.core.String
+          type: string
+        idField:
+          title: mojo.core.String
+          type: string
+        sql:
+          $ref: '#/components/schemas/tilestream.providers.postgis.Config.Sql'
+        uri:
+          title: mojo.core.String
+          type: string
+      title: tilestream.providers.postgis.Config.Provider
+      type: object
+    tilestream.providers.postgis.Config.Sql:
+      description: ""
+      properties:
+        fields:
+          items:
+            $ref: '#/components/schemas/tilestream.providers.postgis.Config.Sql.Field'
+          title: mojo.core.Array
+          type: array
+        filter:
+          title: mojo.core.String
+          type: string
+        table:
+          title: mojo.core.String
+          type: string
+      title: tilestream.providers.postgis.Config.Sql
+      type: object
+    tilestream.providers.postgis.Config.Sql.Field:
+      description: ""
+      properties:
+        alias:
+          title: mojo.core.String
+          type: string
+        name:
+          title: mojo.core.String
+          type: string
+      title: tilestream.providers.postgis.Config.Sql.Field
+      type: object
 info:
   description: ""
   title: Tilestream service
@@ -357,9 +439,47 @@ paths:
         schema:
           title: mojo.core.String
           type: string
-      - description: show config of layer, hide layer config in most cases
+      - description: the page size for pagination request
         in: query
-        name: show_config
+        name: page_size
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - description: the page token for pagination request, usually like "1", "2"
+          ...
+        in: query
+        name: page_token
+        schema:
+          title: mojo.core.String
+          type: string
+      - description: skip the first items count for the request
+        in: query
+        name: skip
+        schema:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+      - description: the mojo expression for DB query
+        in: query
+        name: filter
+        schema:
+          title: mojo.core.String
+          type: string
+      - description: setting the order field for result, like "name desc"
+        in: query
+        name: order
+        schema:
+          $ref: '#/components/schemas/mojo.core.Ordering'
+      - description: control the fields which need to be retrieved
+        in: query
+        name: field_mask
+        schema:
+          $ref: '#/components/schemas/mojo.core.FieldMask'
+      - description: make the fields which returns are unique, equals to "SELECT DISTINCT"
+          in sql
+        in: query
+        name: unique
         schema:
           title: mojo.core.Bool
           type: boolean
@@ -507,7 +627,7 @@ paths:
           format: Int32
           title: mojo.core.Int32
           type: integer
-      - in: path
+      - in: query
         name: format
         schema:
           title: mojo.core.String
@@ -546,7 +666,7 @@ paths:
           format: Int32
           title: mojo.core.Int32
           type: integer
-      - in: path
+      - in: query
         name: format
         schema:
           title: mojo.core.String
@@ -585,7 +705,7 @@ paths:
           format: Int32
           title: mojo.core.Int32
           type: integer
-      - in: path
+      - in: query
         name: format
         schema:
           title: mojo.core.String
@@ -599,122 +719,62 @@ paths:
       responses:
         "200":
           description: OK
-  /tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}:
+  /tilestream/v1/layers:batch:
     get:
       description: ""
-      operationId: get_tile
+      operationId: batch_get_layers
       parameters:
-      - in: path
-        name: layer
+      - in: query
+        name: layers
         schema:
-          title: mojo.core.String
-          type: string
-      - in: path
-        name: level
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: x
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: "y"
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: format
-        schema:
-          title: mojo.core.String
-          type: string
+          items:
+            title: mojo.core.String
+            type: string
+          title: mojo.core.Array
+          type: array
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/tilestream.Tile'
+                items:
+                  $ref: '#/components/schemas/tilestream.Layer'
+                title: mojo.core.Array
+                type: array
           description: OK
     post:
       description: ""
-      operationId: create_tile
-      parameters:
-      - in: path
-        name: layer
-        schema:
-          title: mojo.core.String
-          type: string
-      - in: path
-        name: level
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: x
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: "y"
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: format
-        schema:
-          title: mojo.core.String
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/tilestream.Tile'
-          description: OK
-    put:
-      description: ""
-      operationId: update_tile
-      parameters:
-      - in: path
-        name: layer
-        schema:
-          title: mojo.core.String
-          type: string
-      - in: path
-        name: level
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: x
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: "y"
-        schema:
-          format: Int32
-          title: mojo.core.Int32
-          type: integer
-      - in: path
-        name: format
-        schema:
-          title: mojo.core.String
-          type: string
+      operationId: batch_create_layer
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/tilestream.Tile'
+              items:
+                $ref: '#/components/schemas/tilestream.Layer'
+              title: mojo.core.Array
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/tilestream.Layer'
+                title: mojo.core.Array
+                type: array
+          description: OK
+    put:
+      description: ""
+      operationId: batch_update_layer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/tilestream.Layer'
+              title: mojo.core.Array
+              type: array
         required: true
       responses:
         "200":

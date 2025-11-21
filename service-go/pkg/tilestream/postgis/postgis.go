@@ -6,72 +6,85 @@ import (
 	"fmt"
 	"github.com/go-spatial/geom/slippy"
 	"github.com/go-spatial/tegola/atlas"
-	"github.com/go-spatial/tegola/config"
 	"github.com/go-spatial/tegola/dict"
 	_ "github.com/go-spatial/tegola/provider/postgis"
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
-	"github.com/ncraft-io/ncraft/go/pkg/ncraft/kvstore"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/geom"
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
+	postgis2 "github.com/ncraft-io/tilestream/go/pkg/tilestream/providers/postgis"
 	"github.com/ncraft-io/tilestream/service-go/pkg/tilestream"
-	"strings"
 )
 
 type Postgis struct {
-	Config *Config
+	Config *AtlasConfig
 	Atlas  *atlas.Atlas
 }
 
 func init() {
 	createReader := func(options core.Options) tilestream.TileReader {
-		p, _ := New(options)
+		p, err := New(options)
+		if err != nil {
+			logs.Errorf("failed to create reader", "error", err)
+			panic(err)
+		}
+
 		return p
 	}
 	_ = tilestream.RegisterReader("postgis", createReader)
 
 	createTileStream := func(options core.Options) tilestream.TileStream {
-		p, _ := New(options)
+		p, err := New(options)
+		if err != nil {
+			logs.Errorf("failed to create tilestream", "error", err)
+			panic(err)
+		}
 		return p
 	}
 	_ = tilestream.RegisterTileStream("postgis", createTileStream)
 }
 
 func New(options core.Options) (*Postgis, error) {
-	postgis := &Postgis{}
-	postgis.Config = &Config{}
-
-	atlasConf := options["atlas"]
-	options["atlas"] = nil
-	_ = kvstore.ResetOptions(options, postgis.Config)
-	if atlasConf == nil {
-		panic("atlas config is null")
+	cfg, err := postgis2.NewConfig(options)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("invalid options for postgis provider. err: %s", err.Error()))
 	}
-	if atlasStr, e := resetAtlasOptions(atlasConf.(map[string]interface{})); e == nil {
-		r := strings.NewReader(atlasStr)
-		postgis.Config.Atlas, e = config.Parse(r, "")
-		if e != nil {
-			//logs.Error(e)
-			logs.ErrLogw("", "err", e)
+	if cfg.Provider == nil {
+		return nil, errors.New("invalid options for postgis provider: should has provider")
+	}
+
+	if len(cfg.Provider.Uri) == 0 {
+		cfg.Provider.Uri = tilestream.Conf.DefaultDbUri
+		if len(cfg.Provider.Uri) == 0 {
+			return nil, errors.New("invalid options for postgis provider: should has provider's sql uri")
 		}
 	}
 
-	//var e error
-	//postgis.Config.Atlas, e = config.Load("config.toml")
-	//if e != nil{
-	//	logs.Error(e)
-	//}
+	if cfg.Bounds == nil {
+		cfg.Bounds = &geom.BoundingBox{}
+	}
+	if cfg.Bounds.LeftBottom == nil {
+		cfg.Bounds.LeftBottom = &geom.LngLat{Longitude: 120, Latitude: 30}
+	}
+	if cfg.Bounds.RightTop == nil {
+		cfg.Bounds.RightTop = &geom.LngLat{Longitude: 123, Latitude: 32}
+	}
 
-	aconf := postgis.Config.Atlas
-	aconf.ConfigureTileBuffers()
+	postgis := &Postgis{}
+	postgis.Config, err = NewAtlasConfig(cfg)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("invalid altas config for postgis provider. err: %s", err.Error()))
+	}
 
-	if err := aconf.Validate(); err != nil {
+	atl := postgis.Config.Atlas
+	if err = atl.Validate(); err != nil {
 		return nil, err
 	}
 
 	// init our providers
 	// but first convert []env.Map -> []dict.Dicter
-	provArr := make([]dict.Dicter, len(aconf.Providers))
+	provArr := make([]dict.Dicter, len(atl.Providers))
 	for i := range provArr {
-		provArr[i] = aconf.Providers[i]
+		provArr[i] = atl.Providers[i]
 	}
 
 	providers, err := Providers(provArr)
@@ -79,15 +92,17 @@ func New(options core.Options) (*Postgis, error) {
 		return nil, fmt.Errorf("could not register providers: %v", err)
 	}
 
+	postgis.Atlas = &atlas.Atlas{}
+
 	// init our maps
-	if err = Maps(nil, aconf.Maps, providers); err != nil {
+	if err = Maps(postgis.Atlas, atl.Maps, providers); err != nil {
 		return nil, fmt.Errorf("could not register maps: %v", err)
 	}
 
 	return postgis, nil
 }
 
-func (p Postgis) Tile(ctx context.Context, x, y, level int32) ([]byte, core.Options, error) {
+func (p *Postgis) Tile(ctx context.Context, x, y, level int32) ([]byte, core.Options, error) {
 	// lookup our Map
 	m, err := p.Atlas.Map(p.Config.MapName)
 	if err != nil {
@@ -126,27 +141,28 @@ func (p Postgis) Tile(ctx context.Context, x, y, level int32) ([]byte, core.Opti
 	options := core.NewOptions(
 		"Format", "mvt",
 		"Content-Type", "application/vnd.mapbox-vector-tile",
+		"Content-Encoding", "gzip",
 	)
 
 	return b, options, nil
 }
 
-func (p Postgis) Info(ctx context.Context) (*tilestream.TileInfo, error) {
+func (p *Postgis) Info(ctx context.Context) (*tilestream.TileInfo, error) {
 	return nil, nil
 }
 
-func (p Postgis) StartWriting(ctx context.Context) error {
+func (p *Postgis) StartWriting(ctx context.Context) error {
 	return errors.New("not implemented")
 }
 
-func (p Postgis) StopWriting(ctx context.Context) error {
+func (p *Postgis) StopWriting(ctx context.Context) error {
 	return errors.New("not implemented")
 }
 
-func (p Postgis) WriteTile(ctx context.Context, x, y, z int32, tile []byte) error {
+func (p *Postgis) WriteTile(ctx context.Context, x, y, z int32, tile []byte) error {
 	return errors.New("not implemented")
 }
 
-func (p Postgis) WriteInfo(ctx context.Context, info *tilestream.TileInfo) error {
+func (p *Postgis) WriteInfo(ctx context.Context, info *tilestream.TileInfo) error {
 	return errors.New("not implemented")
 }

@@ -263,6 +263,37 @@ public final class TilestreamGrpc {
     return getCreateLayerMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchCreateLayerRequest,
+      io.ncraft.tilestream.v1.BatchCreateLayerResponse> getBatchCreateLayerMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "batch_create_layer",
+      requestType = io.ncraft.tilestream.v1.BatchCreateLayerRequest.class,
+      responseType = io.ncraft.tilestream.v1.BatchCreateLayerResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchCreateLayerRequest,
+      io.ncraft.tilestream.v1.BatchCreateLayerResponse> getBatchCreateLayerMethod() {
+    io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchCreateLayerRequest, io.ncraft.tilestream.v1.BatchCreateLayerResponse> getBatchCreateLayerMethod;
+    if ((getBatchCreateLayerMethod = TilestreamGrpc.getBatchCreateLayerMethod) == null) {
+      synchronized (TilestreamGrpc.class) {
+        if ((getBatchCreateLayerMethod = TilestreamGrpc.getBatchCreateLayerMethod) == null) {
+          TilestreamGrpc.getBatchCreateLayerMethod = getBatchCreateLayerMethod =
+              io.grpc.MethodDescriptor.<io.ncraft.tilestream.v1.BatchCreateLayerRequest, io.ncraft.tilestream.v1.BatchCreateLayerResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "batch_create_layer"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  io.ncraft.tilestream.v1.BatchCreateLayerRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  io.ncraft.tilestream.v1.BatchCreateLayerResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new TilestreamMethodDescriptorSupplier("batch_create_layer"))
+              .build();
+        }
+      }
+    }
+    return getBatchCreateLayerMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.UpdateLayerRequest,
       org.mojolang.mojo.core.Null> getUpdateLayerMethod;
 
@@ -292,6 +323,37 @@ public final class TilestreamGrpc {
       }
     }
     return getUpdateLayerMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchUpdateLayerRequest,
+      org.mojolang.mojo.core.Null> getBatchUpdateLayerMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "batch_update_layer",
+      requestType = io.ncraft.tilestream.v1.BatchUpdateLayerRequest.class,
+      responseType = org.mojolang.mojo.core.Null.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchUpdateLayerRequest,
+      org.mojolang.mojo.core.Null> getBatchUpdateLayerMethod() {
+    io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchUpdateLayerRequest, org.mojolang.mojo.core.Null> getBatchUpdateLayerMethod;
+    if ((getBatchUpdateLayerMethod = TilestreamGrpc.getBatchUpdateLayerMethod) == null) {
+      synchronized (TilestreamGrpc.class) {
+        if ((getBatchUpdateLayerMethod = TilestreamGrpc.getBatchUpdateLayerMethod) == null) {
+          TilestreamGrpc.getBatchUpdateLayerMethod = getBatchUpdateLayerMethod =
+              io.grpc.MethodDescriptor.<io.ncraft.tilestream.v1.BatchUpdateLayerRequest, org.mojolang.mojo.core.Null>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "batch_update_layer"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  io.ncraft.tilestream.v1.BatchUpdateLayerRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  org.mojolang.mojo.core.Null.getDefaultInstance()))
+              .setSchemaDescriptor(new TilestreamMethodDescriptorSupplier("batch_update_layer"))
+              .build();
+        }
+      }
+    }
+    return getBatchUpdateLayerMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.DeleteLayerRequest,
@@ -354,6 +416,37 @@ public final class TilestreamGrpc {
       }
     }
     return getGetLayerMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchGetLayersRequest,
+      io.ncraft.tilestream.v1.BatchGetLayersResponse> getBatchGetLayersMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "batch_get_layers",
+      requestType = io.ncraft.tilestream.v1.BatchGetLayersRequest.class,
+      responseType = io.ncraft.tilestream.v1.BatchGetLayersResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchGetLayersRequest,
+      io.ncraft.tilestream.v1.BatchGetLayersResponse> getBatchGetLayersMethod() {
+    io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.BatchGetLayersRequest, io.ncraft.tilestream.v1.BatchGetLayersResponse> getBatchGetLayersMethod;
+    if ((getBatchGetLayersMethod = TilestreamGrpc.getBatchGetLayersMethod) == null) {
+      synchronized (TilestreamGrpc.class) {
+        if ((getBatchGetLayersMethod = TilestreamGrpc.getBatchGetLayersMethod) == null) {
+          TilestreamGrpc.getBatchGetLayersMethod = getBatchGetLayersMethod =
+              io.grpc.MethodDescriptor.<io.ncraft.tilestream.v1.BatchGetLayersRequest, io.ncraft.tilestream.v1.BatchGetLayersResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "batch_get_layers"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  io.ncraft.tilestream.v1.BatchGetLayersRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  io.ncraft.tilestream.v1.BatchGetLayersResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new TilestreamMethodDescriptorSupplier("batch_get_layers"))
+              .build();
+        }
+      }
+    }
+    return getBatchGetLayersMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<io.ncraft.tilestream.v1.ListLayersRequest,
@@ -493,9 +586,23 @@ public final class TilestreamGrpc {
 
     /**
      */
+    default void batchCreateLayer(io.ncraft.tilestream.v1.BatchCreateLayerRequest request,
+        io.grpc.stub.StreamObserver<io.ncraft.tilestream.v1.BatchCreateLayerResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getBatchCreateLayerMethod(), responseObserver);
+    }
+
+    /**
+     */
     default void updateLayer(io.ncraft.tilestream.v1.UpdateLayerRequest request,
         io.grpc.stub.StreamObserver<org.mojolang.mojo.core.Null> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getUpdateLayerMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void batchUpdateLayer(io.ncraft.tilestream.v1.BatchUpdateLayerRequest request,
+        io.grpc.stub.StreamObserver<org.mojolang.mojo.core.Null> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getBatchUpdateLayerMethod(), responseObserver);
     }
 
     /**
@@ -510,6 +617,13 @@ public final class TilestreamGrpc {
     default void getLayer(io.ncraft.tilestream.v1.GetLayerRequest request,
         io.grpc.stub.StreamObserver<io.ncraft.tilestream.Layer> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetLayerMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void batchGetLayers(io.ncraft.tilestream.v1.BatchGetLayersRequest request,
+        io.grpc.stub.StreamObserver<io.ncraft.tilestream.v1.BatchGetLayersResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getBatchGetLayersMethod(), responseObserver);
     }
 
     /**
@@ -613,10 +727,26 @@ public final class TilestreamGrpc {
 
     /**
      */
+    public void batchCreateLayer(io.ncraft.tilestream.v1.BatchCreateLayerRequest request,
+        io.grpc.stub.StreamObserver<io.ncraft.tilestream.v1.BatchCreateLayerResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getBatchCreateLayerMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
     public void updateLayer(io.ncraft.tilestream.v1.UpdateLayerRequest request,
         io.grpc.stub.StreamObserver<org.mojolang.mojo.core.Null> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getUpdateLayerMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void batchUpdateLayer(io.ncraft.tilestream.v1.BatchUpdateLayerRequest request,
+        io.grpc.stub.StreamObserver<org.mojolang.mojo.core.Null> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getBatchUpdateLayerMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -633,6 +763,14 @@ public final class TilestreamGrpc {
         io.grpc.stub.StreamObserver<io.ncraft.tilestream.Layer> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getGetLayerMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void batchGetLayers(io.ncraft.tilestream.v1.BatchGetLayersRequest request,
+        io.grpc.stub.StreamObserver<io.ncraft.tilestream.v1.BatchGetLayersResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getBatchGetLayersMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -718,9 +856,23 @@ public final class TilestreamGrpc {
 
     /**
      */
+    public io.ncraft.tilestream.v1.BatchCreateLayerResponse batchCreateLayer(io.ncraft.tilestream.v1.BatchCreateLayerRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getBatchCreateLayerMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
     public org.mojolang.mojo.core.Null updateLayer(io.ncraft.tilestream.v1.UpdateLayerRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getUpdateLayerMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public org.mojolang.mojo.core.Null batchUpdateLayer(io.ncraft.tilestream.v1.BatchUpdateLayerRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getBatchUpdateLayerMethod(), getCallOptions(), request);
     }
 
     /**
@@ -735,6 +887,13 @@ public final class TilestreamGrpc {
     public io.ncraft.tilestream.Layer getLayer(io.ncraft.tilestream.v1.GetLayerRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getGetLayerMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public io.ncraft.tilestream.v1.BatchGetLayersResponse batchGetLayers(io.ncraft.tilestream.v1.BatchGetLayersRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getBatchGetLayersMethod(), getCallOptions(), request);
     }
 
     /**
@@ -827,10 +986,26 @@ public final class TilestreamGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<io.ncraft.tilestream.v1.BatchCreateLayerResponse> batchCreateLayer(
+        io.ncraft.tilestream.v1.BatchCreateLayerRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getBatchCreateLayerMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<org.mojolang.mojo.core.Null> updateLayer(
         io.ncraft.tilestream.v1.UpdateLayerRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getUpdateLayerMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<org.mojolang.mojo.core.Null> batchUpdateLayer(
+        io.ncraft.tilestream.v1.BatchUpdateLayerRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getBatchUpdateLayerMethod(), getCallOptions()), request);
     }
 
     /**
@@ -851,6 +1026,14 @@ public final class TilestreamGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<io.ncraft.tilestream.v1.BatchGetLayersResponse> batchGetLayers(
+        io.ncraft.tilestream.v1.BatchGetLayersRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getBatchGetLayersMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<io.ncraft.tilestream.v1.ListLayersResponse> listLayers(
         io.ncraft.tilestream.v1.ListLayersRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
@@ -866,10 +1049,13 @@ public final class TilestreamGrpc {
   private static final int METHODID_UPDATE_TILE = 5;
   private static final int METHODID_UPDATE_TILE_INFO = 6;
   private static final int METHODID_CREATE_LAYER = 7;
-  private static final int METHODID_UPDATE_LAYER = 8;
-  private static final int METHODID_DELETE_LAYER = 9;
-  private static final int METHODID_GET_LAYER = 10;
-  private static final int METHODID_LIST_LAYERS = 11;
+  private static final int METHODID_BATCH_CREATE_LAYER = 8;
+  private static final int METHODID_UPDATE_LAYER = 9;
+  private static final int METHODID_BATCH_UPDATE_LAYER = 10;
+  private static final int METHODID_DELETE_LAYER = 11;
+  private static final int METHODID_GET_LAYER = 12;
+  private static final int METHODID_BATCH_GET_LAYERS = 13;
+  private static final int METHODID_LIST_LAYERS = 14;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -920,8 +1106,16 @@ public final class TilestreamGrpc {
           serviceImpl.createLayer((io.ncraft.tilestream.v1.CreateLayerRequest) request,
               (io.grpc.stub.StreamObserver<io.ncraft.tilestream.Layer>) responseObserver);
           break;
+        case METHODID_BATCH_CREATE_LAYER:
+          serviceImpl.batchCreateLayer((io.ncraft.tilestream.v1.BatchCreateLayerRequest) request,
+              (io.grpc.stub.StreamObserver<io.ncraft.tilestream.v1.BatchCreateLayerResponse>) responseObserver);
+          break;
         case METHODID_UPDATE_LAYER:
           serviceImpl.updateLayer((io.ncraft.tilestream.v1.UpdateLayerRequest) request,
+              (io.grpc.stub.StreamObserver<org.mojolang.mojo.core.Null>) responseObserver);
+          break;
+        case METHODID_BATCH_UPDATE_LAYER:
+          serviceImpl.batchUpdateLayer((io.ncraft.tilestream.v1.BatchUpdateLayerRequest) request,
               (io.grpc.stub.StreamObserver<org.mojolang.mojo.core.Null>) responseObserver);
           break;
         case METHODID_DELETE_LAYER:
@@ -931,6 +1125,10 @@ public final class TilestreamGrpc {
         case METHODID_GET_LAYER:
           serviceImpl.getLayer((io.ncraft.tilestream.v1.GetLayerRequest) request,
               (io.grpc.stub.StreamObserver<io.ncraft.tilestream.Layer>) responseObserver);
+          break;
+        case METHODID_BATCH_GET_LAYERS:
+          serviceImpl.batchGetLayers((io.ncraft.tilestream.v1.BatchGetLayersRequest) request,
+              (io.grpc.stub.StreamObserver<io.ncraft.tilestream.v1.BatchGetLayersResponse>) responseObserver);
           break;
         case METHODID_LIST_LAYERS:
           serviceImpl.listLayers((io.ncraft.tilestream.v1.ListLayersRequest) request,
@@ -1011,12 +1209,26 @@ public final class TilestreamGrpc {
               io.ncraft.tilestream.Layer>(
                 service, METHODID_CREATE_LAYER)))
         .addMethod(
+          getBatchCreateLayerMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              io.ncraft.tilestream.v1.BatchCreateLayerRequest,
+              io.ncraft.tilestream.v1.BatchCreateLayerResponse>(
+                service, METHODID_BATCH_CREATE_LAYER)))
+        .addMethod(
           getUpdateLayerMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
               io.ncraft.tilestream.v1.UpdateLayerRequest,
               org.mojolang.mojo.core.Null>(
                 service, METHODID_UPDATE_LAYER)))
+        .addMethod(
+          getBatchUpdateLayerMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              io.ncraft.tilestream.v1.BatchUpdateLayerRequest,
+              org.mojolang.mojo.core.Null>(
+                service, METHODID_BATCH_UPDATE_LAYER)))
         .addMethod(
           getDeleteLayerMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
@@ -1031,6 +1243,13 @@ public final class TilestreamGrpc {
               io.ncraft.tilestream.v1.GetLayerRequest,
               io.ncraft.tilestream.Layer>(
                 service, METHODID_GET_LAYER)))
+        .addMethod(
+          getBatchGetLayersMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              io.ncraft.tilestream.v1.BatchGetLayersRequest,
+              io.ncraft.tilestream.v1.BatchGetLayersResponse>(
+                service, METHODID_BATCH_GET_LAYERS)))
         .addMethod(
           getListLayersMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
@@ -1094,9 +1313,12 @@ public final class TilestreamGrpc {
               .addMethod(getUpdateTileMethod())
               .addMethod(getUpdateTileInfoMethod())
               .addMethod(getCreateLayerMethod())
+              .addMethod(getBatchCreateLayerMethod())
               .addMethod(getUpdateLayerMethod())
+              .addMethod(getBatchUpdateLayerMethod())
               .addMethod(getDeleteLayerMethod())
               .addMethod(getGetLayerMethod())
+              .addMethod(getBatchGetLayersMethod())
               .addMethod(getListLayersMethod())
               .build();
         }

@@ -21,6 +21,11 @@
             "title": "mojo.core.String",
             "type": "string"
         },
+        "originalId": {
+            "title": "mojo.core.String",
+            "description": "copied layer from original layer id",
+            "type": "string"
+        },
         "templated": {
             "title": "mojo.core.Bool",
             "type": "boolean"

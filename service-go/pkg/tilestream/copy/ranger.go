@@ -1,7 +1,7 @@
 package copy
 
 import (
-	"github.com/mojo-lang/geom/go/pkg/mojo/geom"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/geom"
 	"github.com/ncraft-io/tilestream/go/pkg/tilestream"
 )
 

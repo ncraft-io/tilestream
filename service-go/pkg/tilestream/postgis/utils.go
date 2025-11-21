@@ -1,6 +1,7 @@
 package postgis
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-spatial/geom"
 	"github.com/go-spatial/tegola"
@@ -103,7 +104,7 @@ func Maps(a *atlas.Atlas, maps []provider.Map, providers map[string]provider.Til
 			// lookup our proivder
 			provider, ok := providers[providerLayer[0]]
 			if !ok {
-				return fmt.Errorf(`Provider Not Found ` + providerLayer[0])
+				return errors.New(`Provider Not Found ` + providerLayer[0])
 			}
 
 			// read the provider's layer names
@@ -154,6 +155,7 @@ func Maps(a *atlas.Atlas, maps []provider.Map, providers map[string]provider.Til
 				GeomType:          layerGeomType,
 				DontSimplify:      bool(l.DontSimplify),
 				DontClip:          bool(l.DontClip),
+				DontClean:         bool(l.DontClean),
 			})
 		}
 

@@ -1,9 +1,14 @@
 package tilestream
 
-import "github.com/mojo-lang/core/go/pkg/mojo/core"
+import "github.com/mojo-lang/mojo/go/pkg/mojo/core"
 
 type Config struct {
-	Name    string       `json:"name"`
-	Type    string       `json:"type"`
-	Options core.Options `json:"options"`
+	DefaultDbUri string       `json:"defaultDbUri,omitempty"`
+	Layers       []*LyrConfig `json:"layers,omitempty"`
+}
+
+type LyrConfig struct {
+	Name    string       `json:"name,omitempty"`
+	Type    string       `json:"type,omitempty"`
+	Options core.Options `json:"options,omitempty"`
 }

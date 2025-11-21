@@ -22,17 +22,17 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 
-	"github.com/ncraft-io/ncraft-gokit/pkg/utils/network"
+	"github.com/ncraft-io/ncraft/go/pkg/gokit/utils/network"
 	_ "go.uber.org/automaxprocs"
 
-	nclient "github.com/ncraft-io/ncraft-gokit/pkg/client"
+	nclient "github.com/ncraft-io/ncraft/go/pkg/gokit/client"
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
 
-	"github.com/ncraft-io/ncraft-gokit/pkg/kit"
-	"github.com/ncraft-io/ncraft-gokit/pkg/metrics"
-	"github.com/ncraft-io/ncraft-gokit/pkg/sd"
-	nserver "github.com/ncraft-io/ncraft-gokit/pkg/server"
-	"github.com/ncraft-io/ncraft-gokit/pkg/tracing"
+	"github.com/ncraft-io/ncraft/go/pkg/gokit/kit"
+	"github.com/ncraft-io/ncraft/go/pkg/gokit/metrics"
+	"github.com/ncraft-io/ncraft/go/pkg/gokit/sd"
+	nserver "github.com/ncraft-io/ncraft/go/pkg/gokit/server"
+	"github.com/ncraft-io/ncraft/go/pkg/gokit/tracing"
 
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -67,9 +67,12 @@ func NewEndpoints(options map[string]interface{}) svc.Endpoints {
 		updateTileEndpoint       = svc.MakeUpdateTileEndpoint(service)
 		updateTileInfoEndpoint   = svc.MakeUpdateTileInfoEndpoint(service)
 		createLayerEndpoint      = svc.MakeCreateLayerEndpoint(service)
+		batchCreateLayerEndpoint = svc.MakeBatchCreateLayerEndpoint(service)
 		updateLayerEndpoint      = svc.MakeUpdateLayerEndpoint(service)
+		batchUpdateLayerEndpoint = svc.MakeBatchUpdateLayerEndpoint(service)
 		deleteLayerEndpoint      = svc.MakeDeleteLayerEndpoint(service)
 		getLayerEndpoint         = svc.MakeGetLayerEndpoint(service)
+		batchGetLayersEndpoint   = svc.MakeBatchGetLayersEndpoint(service)
 		listLayersEndpoint       = svc.MakeListLayersEndpoint(service)
 	)
 
@@ -82,9 +85,12 @@ func NewEndpoints(options map[string]interface{}) svc.Endpoints {
 		UpdateTileEndpoint:       updateTileEndpoint,
 		UpdateTileInfoEndpoint:   updateTileInfoEndpoint,
 		CreateLayerEndpoint:      createLayerEndpoint,
+		BatchCreateLayerEndpoint: batchCreateLayerEndpoint,
 		UpdateLayerEndpoint:      updateLayerEndpoint,
+		BatchUpdateLayerEndpoint: batchUpdateLayerEndpoint,
 		DeleteLayerEndpoint:      deleteLayerEndpoint,
 		GetLayerEndpoint:         getLayerEndpoint,
+		BatchGetLayersEndpoint:   batchGetLayersEndpoint,
 		ListLayersEndpoint:       listLayersEndpoint,
 	}
 

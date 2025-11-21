@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/golang/geo/s2"
-	"github.com/mojo-lang/geom/go/pkg/mojo/geom"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/geom"
 )
 
 const (

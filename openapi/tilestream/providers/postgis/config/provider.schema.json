@@ -1,0 +1,22 @@
+{
+    "title": "tilestream.providers.postgis.Config.Provider",
+    "description": "",
+    "type": "object",
+    "properties": {
+        "geometryField": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "idField": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "sql": {
+            "$ref": "#/components/schemas/tilestream.providers.postgis.Config.Sql"
+        },
+        "uri": {
+            "title": "mojo.core.String",
+            "type": "string"
+        }
+    }
+}

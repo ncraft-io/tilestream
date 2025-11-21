@@ -16,7 +16,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 	"github.com/ncraft-io/tilestream/go/pkg/tilestream"
 
 	// this service api
@@ -28,6 +28,8 @@ var (
 	_ = core.Null{}
 	_ = tilestream.TileInfo{}
 	_ = tilestream.Layer{}
+	_ = core.Ordering{}
+	_ = core.FieldMask{}
 )
 
 // Endpoints collects all of the endpoints that compose an add service. It's
@@ -52,9 +54,12 @@ type Endpoints struct {
 	UpdateTileEndpoint       endpoint.Endpoint
 	UpdateTileInfoEndpoint   endpoint.Endpoint
 	CreateLayerEndpoint      endpoint.Endpoint
+	BatchCreateLayerEndpoint endpoint.Endpoint
 	UpdateLayerEndpoint      endpoint.Endpoint
+	BatchUpdateLayerEndpoint endpoint.Endpoint
 	DeleteLayerEndpoint      endpoint.Endpoint
 	GetLayerEndpoint         endpoint.Endpoint
+	BatchGetLayersEndpoint   endpoint.Endpoint
 	ListLayersEndpoint       endpoint.Endpoint
 }
 
@@ -124,8 +129,24 @@ func (e Endpoints) CreateLayer(ctx context.Context, in *pb.CreateLayerRequest) (
 	return response.(*tilestream.Layer), nil
 }
 
+func (e Endpoints) BatchCreateLayer(ctx context.Context, in *pb.BatchCreateLayerRequest) (*pb.BatchCreateLayerResponse, error) {
+	response, err := e.BatchCreateLayerEndpoint(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return response.(*pb.BatchCreateLayerResponse), nil
+}
+
 func (e Endpoints) UpdateLayer(ctx context.Context, in *pb.UpdateLayerRequest) (*core.Null, error) {
 	response, err := e.UpdateLayerEndpoint(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return response.(*core.Null), nil
+}
+
+func (e Endpoints) BatchUpdateLayer(ctx context.Context, in *pb.BatchUpdateLayerRequest) (*core.Null, error) {
+	response, err := e.BatchUpdateLayerEndpoint(ctx, in)
 	if err != nil {
 		return nil, err
 	}
@@ -146,6 +167,14 @@ func (e Endpoints) GetLayer(ctx context.Context, in *pb.GetLayerRequest) (*tiles
 		return nil, err
 	}
 	return response.(*tilestream.Layer), nil
+}
+
+func (e Endpoints) BatchGetLayers(ctx context.Context, in *pb.BatchGetLayersRequest) (*pb.BatchGetLayersResponse, error) {
+	response, err := e.BatchGetLayersEndpoint(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return response.(*pb.BatchGetLayersResponse), nil
 }
 
 func (e Endpoints) ListLayers(ctx context.Context, in *pb.ListLayersRequest) (*pb.ListLayersResponse, error) {
@@ -246,10 +275,32 @@ func MakeCreateLayerEndpoint(s pb.TilestreamServer) endpoint.Endpoint {
 	}
 }
 
+func MakeBatchCreateLayerEndpoint(s pb.TilestreamServer) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(*pb.BatchCreateLayerRequest)
+		v, err := s.BatchCreateLayer(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		return v, nil
+	}
+}
+
 func MakeUpdateLayerEndpoint(s pb.TilestreamServer) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(*pb.UpdateLayerRequest)
 		v, err := s.UpdateLayer(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		return v, nil
+	}
+}
+
+func MakeBatchUpdateLayerEndpoint(s pb.TilestreamServer) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(*pb.BatchUpdateLayerRequest)
+		v, err := s.BatchUpdateLayer(ctx, req)
 		if err != nil {
 			return nil, err
 		}
@@ -272,6 +323,17 @@ func MakeGetLayerEndpoint(s pb.TilestreamServer) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(*pb.GetLayerRequest)
 		v, err := s.GetLayer(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		return v, nil
+	}
+}
+
+func MakeBatchGetLayersEndpoint(s pb.TilestreamServer) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(*pb.BatchGetLayersRequest)
+		v, err := s.BatchGetLayers(ctx, req)
 		if err != nil {
 			return nil, err
 		}
@@ -305,9 +367,12 @@ func (e *Endpoints) WrapAllExcept(middleware endpoint.Middleware, excluded ...st
 		"update_tile":        struct{}{},
 		"update_tile_info":   struct{}{},
 		"create_layer":       struct{}{},
+		"batch_create_layer": struct{}{},
 		"update_layer":       struct{}{},
+		"batch_update_layer": struct{}{},
 		"delete_layer":       struct{}{},
 		"get_layer":          struct{}{},
+		"batch_get_layers":   struct{}{},
 		"list_layers":        struct{}{},
 	}
 
@@ -343,14 +408,23 @@ func (e *Endpoints) WrapAllExcept(middleware endpoint.Middleware, excluded ...st
 		if inc == "create_layer" {
 			e.CreateLayerEndpoint = middleware(e.CreateLayerEndpoint)
 		}
+		if inc == "batch_create_layer" {
+			e.BatchCreateLayerEndpoint = middleware(e.BatchCreateLayerEndpoint)
+		}
 		if inc == "update_layer" {
 			e.UpdateLayerEndpoint = middleware(e.UpdateLayerEndpoint)
+		}
+		if inc == "batch_update_layer" {
+			e.BatchUpdateLayerEndpoint = middleware(e.BatchUpdateLayerEndpoint)
 		}
 		if inc == "delete_layer" {
 			e.DeleteLayerEndpoint = middleware(e.DeleteLayerEndpoint)
 		}
 		if inc == "get_layer" {
 			e.GetLayerEndpoint = middleware(e.GetLayerEndpoint)
+		}
+		if inc == "batch_get_layers" {
+			e.BatchGetLayersEndpoint = middleware(e.BatchGetLayersEndpoint)
 		}
 		if inc == "list_layers" {
 			e.ListLayersEndpoint = middleware(e.ListLayersEndpoint)
@@ -377,9 +451,12 @@ func (e *Endpoints) WrapAllLabeledExcept(middleware func(string, endpoint.Endpoi
 		"update_tile":        struct{}{},
 		"update_tile_info":   struct{}{},
 		"create_layer":       struct{}{},
+		"batch_create_layer": struct{}{},
 		"update_layer":       struct{}{},
+		"batch_update_layer": struct{}{},
 		"delete_layer":       struct{}{},
 		"get_layer":          struct{}{},
+		"batch_get_layers":   struct{}{},
 		"list_layers":        struct{}{},
 	}
 
@@ -415,14 +492,23 @@ func (e *Endpoints) WrapAllLabeledExcept(middleware func(string, endpoint.Endpoi
 		if inc == "create_layer" {
 			e.CreateLayerEndpoint = middleware("create_layer", e.CreateLayerEndpoint)
 		}
+		if inc == "batch_create_layer" {
+			e.BatchCreateLayerEndpoint = middleware("batch_create_layer", e.BatchCreateLayerEndpoint)
+		}
 		if inc == "update_layer" {
 			e.UpdateLayerEndpoint = middleware("update_layer", e.UpdateLayerEndpoint)
+		}
+		if inc == "batch_update_layer" {
+			e.BatchUpdateLayerEndpoint = middleware("batch_update_layer", e.BatchUpdateLayerEndpoint)
 		}
 		if inc == "delete_layer" {
 			e.DeleteLayerEndpoint = middleware("delete_layer", e.DeleteLayerEndpoint)
 		}
 		if inc == "get_layer" {
 			e.GetLayerEndpoint = middleware("get_layer", e.GetLayerEndpoint)
+		}
+		if inc == "batch_get_layers" {
+			e.BatchGetLayersEndpoint = middleware("batch_get_layers", e.BatchGetLayersEndpoint)
 		}
 		if inc == "list_layers" {
 			e.ListLayersEndpoint = middleware("list_layers", e.ListLayersEndpoint)

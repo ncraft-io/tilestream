@@ -1,6 +1,6 @@
 package copy
 
-import "github.com/mojo-lang/geom/go/pkg/mojo/geom"
+import "github.com/mojo-lang/mojo/go/pkg/mojo/geom"
 
 type Config struct {
 	ReaderThreads  int           `json:"readerThreads,omitempty"`

@@ -1,13 +1,11 @@
 module github.com/ncraft-io/tilestream/go
 
-go 1.24.0
+go 1.24.7
 
 require (
 	github.com/golang/geo v0.0.0-20251014162054-f262919d8753
 	github.com/json-iterator/go v1.1.12
-	github.com/mojo-lang/core/go v0.0.0-20251010030721-0ee80d0523ad
-	github.com/mojo-lang/db/go v0.0.0-20251015085221-d5bedcb1b6f8
-	github.com/mojo-lang/geom/go v0.0.0-20251015083958-e4369a18d99b
+	github.com/mojo-lang/mojo/go v0.0.0-20251109082603-589338c8d9d8
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.36.10
@@ -17,7 +15,7 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/go-sql-driver/mysql v1.9.3 // indirect
 	github.com/golang/protobuf v1.5.1 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
@@ -32,14 +30,15 @@ require (
 	github.com/mmcloughlin/geohash v0.10.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/smilextay/dm v0.0.0-20231121034257-b7bd60563f8b // indirect
 	github.com/smilextay/gorm-dm v0.0.13 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
-	golang.org/x/net v0.45.0 // indirect
+	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/text v0.30.0 // indirect

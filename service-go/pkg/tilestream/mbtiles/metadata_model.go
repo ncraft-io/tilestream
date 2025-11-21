@@ -2,7 +2,7 @@ package mbtiles
 
 import (
 	"context"
-	"github.com/mojo-lang/db/go/pkg/mojo/db"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/db"
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

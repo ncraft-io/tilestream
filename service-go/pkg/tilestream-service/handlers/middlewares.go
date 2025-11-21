@@ -3,10 +3,10 @@ package handlers
 import (
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/go-kit/kit/tracing/opentracing"
-	"github.com/ncraft-io/ncraft-gokit/pkg/middleware"
+	"github.com/ncraft-io/ncraft/go/pkg/gokit/middleware"
 	stdopentracing "github.com/opentracing/opentracing-go"
 
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 	"github.com/ncraft-io/tilestream/go/pkg/tilestream"
 
 	"github.com/ncraft-io/tilestream/service-go/pkg/tilestream-service/svc"
@@ -20,6 +20,8 @@ var (
 	_ = core.Null{}
 	_ = tilestream.TileInfo{}
 	_ = tilestream.Layer{}
+	_ = core.Ordering{}
+	_ = core.FieldMask{}
 )
 
 // WrapEndpoints accepts the service's entire collection of endpoints, so that a
@@ -69,6 +71,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.CreateTileEndpoint = middleware.Instrumenting(latency.With("method", "create_tile"), count.With("method", "create_tile"))(in.CreateTileEndpoint)
 		}
+		in.CreateTileEndpoint = middleware.NewJWT()(in.CreateTileEndpoint)
 		//if validator != nil {
 		//	in.CreateTileEndpoint = validator.Validate()(in.CreateTileEndpoint)
 		//}
@@ -80,6 +83,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.BatchCreateTilesEndpoint = middleware.Instrumenting(latency.With("method", "batch_create_tiles"), count.With("method", "batch_create_tiles"))(in.BatchCreateTilesEndpoint)
 		}
+		in.BatchCreateTilesEndpoint = middleware.NewJWT()(in.BatchCreateTilesEndpoint)
 		//if validator != nil {
 		//	in.BatchCreateTilesEndpoint = validator.Validate()(in.BatchCreateTilesEndpoint)
 		//}
@@ -91,6 +95,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.CreateTilesEndpoint = middleware.Instrumenting(latency.With("method", "create_tiles"), count.With("method", "create_tiles"))(in.CreateTilesEndpoint)
 		}
+		in.CreateTilesEndpoint = middleware.NewJWT()(in.CreateTilesEndpoint)
 		//if validator != nil {
 		//	in.CreateTilesEndpoint = validator.Validate()(in.CreateTilesEndpoint)
 		//}
@@ -102,6 +107,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.GetTileEndpoint = middleware.Instrumenting(latency.With("method", "get_tile"), count.With("method", "get_tile"))(in.GetTileEndpoint)
 		}
+		in.GetTileEndpoint = middleware.NewJWT()(in.GetTileEndpoint)
 		//if validator != nil {
 		//	in.GetTileEndpoint = validator.Validate()(in.GetTileEndpoint)
 		//}
@@ -113,6 +119,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.GetTileInfoEndpoint = middleware.Instrumenting(latency.With("method", "get_tile_info"), count.With("method", "get_tile_info"))(in.GetTileInfoEndpoint)
 		}
+		in.GetTileInfoEndpoint = middleware.NewJWT()(in.GetTileInfoEndpoint)
 		//if validator != nil {
 		//	in.GetTileInfoEndpoint = validator.Validate()(in.GetTileInfoEndpoint)
 		//}
@@ -124,6 +131,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.UpdateTileEndpoint = middleware.Instrumenting(latency.With("method", "update_tile"), count.With("method", "update_tile"))(in.UpdateTileEndpoint)
 		}
+		in.UpdateTileEndpoint = middleware.NewJWT()(in.UpdateTileEndpoint)
 		//if validator != nil {
 		//	in.UpdateTileEndpoint = validator.Validate()(in.UpdateTileEndpoint)
 		//}
@@ -135,6 +143,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.UpdateTileInfoEndpoint = middleware.Instrumenting(latency.With("method", "update_tile_info"), count.With("method", "update_tile_info"))(in.UpdateTileInfoEndpoint)
 		}
+		in.UpdateTileInfoEndpoint = middleware.NewJWT()(in.UpdateTileInfoEndpoint)
 		//if validator != nil {
 		//	in.UpdateTileInfoEndpoint = validator.Validate()(in.UpdateTileInfoEndpoint)
 		//}
@@ -146,6 +155,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.CreateLayerEndpoint = middleware.Instrumenting(latency.With("method", "create_layer"), count.With("method", "create_layer"))(in.CreateLayerEndpoint)
 		}
+		in.CreateLayerEndpoint = middleware.NewJWT()(in.CreateLayerEndpoint)
 		//if validator != nil {
 		//	in.CreateLayerEndpoint = validator.Validate()(in.CreateLayerEndpoint)
 		//}
@@ -157,8 +167,21 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.UpdateLayerEndpoint = middleware.Instrumenting(latency.With("method", "update_layer"), count.With("method", "update_layer"))(in.UpdateLayerEndpoint)
 		}
+		in.UpdateLayerEndpoint = middleware.NewJWT()(in.UpdateLayerEndpoint)
 		//if validator != nil {
 		//	in.UpdateLayerEndpoint = validator.Validate()(in.UpdateLayerEndpoint)
+		//}
+	}
+	{ // batch_update_layer
+		if tracer != nil {
+			in.BatchUpdateLayerEndpoint = opentracing.TraceServer(tracer, "batch_update_layer")(in.BatchUpdateLayerEndpoint)
+		}
+		if count != nil && latency != nil {
+			in.BatchUpdateLayerEndpoint = middleware.Instrumenting(latency.With("method", "batch_update_layer"), count.With("method", "batch_update_layer"))(in.BatchUpdateLayerEndpoint)
+		}
+		in.BatchUpdateLayerEndpoint = middleware.NewJWT()(in.BatchUpdateLayerEndpoint)
+		//if validator != nil {
+		//	in.BatchUpdateLayerEndpoint = validator.Validate()(in.BatchUpdateLayerEndpoint)
 		//}
 	}
 	{ // delete_layer
@@ -168,6 +191,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.DeleteLayerEndpoint = middleware.Instrumenting(latency.With("method", "delete_layer"), count.With("method", "delete_layer"))(in.DeleteLayerEndpoint)
 		}
+		in.DeleteLayerEndpoint = middleware.NewJWT()(in.DeleteLayerEndpoint)
 		//if validator != nil {
 		//	in.DeleteLayerEndpoint = validator.Validate()(in.DeleteLayerEndpoint)
 		//}
@@ -179,8 +203,21 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.GetLayerEndpoint = middleware.Instrumenting(latency.With("method", "get_layer"), count.With("method", "get_layer"))(in.GetLayerEndpoint)
 		}
+		in.GetLayerEndpoint = middleware.NewJWT()(in.GetLayerEndpoint)
 		//if validator != nil {
 		//	in.GetLayerEndpoint = validator.Validate()(in.GetLayerEndpoint)
+		//}
+	}
+	{ // batch_get_layers
+		if tracer != nil {
+			in.BatchGetLayersEndpoint = opentracing.TraceServer(tracer, "batch_get_layers")(in.BatchGetLayersEndpoint)
+		}
+		if count != nil && latency != nil {
+			in.BatchGetLayersEndpoint = middleware.Instrumenting(latency.With("method", "batch_get_layers"), count.With("method", "batch_get_layers"))(in.BatchGetLayersEndpoint)
+		}
+		in.BatchGetLayersEndpoint = middleware.NewJWT()(in.BatchGetLayersEndpoint)
+		//if validator != nil {
+		//	in.BatchGetLayersEndpoint = validator.Validate()(in.BatchGetLayersEndpoint)
 		//}
 	}
 	{ // list_layers
@@ -190,6 +227,7 @@ func WrapEndpoints(in svc.Endpoints, options map[string]interface{}) svc.Endpoin
 		if count != nil && latency != nil {
 			in.ListLayersEndpoint = middleware.Instrumenting(latency.With("method", "list_layers"), count.With("method", "list_layers"))(in.ListLayersEndpoint)
 		}
+		in.ListLayersEndpoint = middleware.NewJWT()(in.ListLayersEndpoint)
 		//if validator != nil {
 		//	in.ListLayersEndpoint = validator.Validate()(in.ListLayersEndpoint)
 		//}

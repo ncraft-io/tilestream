@@ -2,7 +2,6 @@
 /// Tilestream service
 interface Tilestream {
     @http.post("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}")
-    @http.post("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}")
     create_tile (layer: String @1
                  level: Int32 @2
                  x: Int32 @3
@@ -15,9 +14,7 @@ interface Tilestream {
     create_tiles (layer: String @1
                   tiles: [Tile] @2 @http.body)
 
-
     @http.get("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}")
-    @http.get("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}")
     get_tile (layer: String @1
                  level: Int32 @2
                  x: Int32 @3
@@ -29,7 +26,6 @@ interface Tilestream {
     get_tile_info (layer: String @1) -> TileInfo
 
     @http.put("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}")
-    @http.put("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}")
     update_tile (layer: String @1
                  level: Int32 @2
                  x: Int32 @3
@@ -44,8 +40,14 @@ interface Tilestream {
     @http.post("/tilestream/v1/layers")
     create_layer (layer: Layer @1 @http.body) -> Layer
 
+    @http.post("/tilestream/v1/layers:batch")
+    batch_create_layer (layers: [Layer] @2 @http.body) -> [Layer]
+
     @http.put("/tilestream/v1/layers/{id}")
     update_layer (id: String @1, layer: Layer @2 @http.body)
+
+    @http.put("/tilestream/v1/layers:batch")
+    batch_update_layer (layers: [Layer] @2 @http.body)
 
     @http.delete("/tilestream/v1/layers/{layer}")
     delete_layer (layer: String @1)
@@ -53,8 +55,12 @@ interface Tilestream {
     @http.get("/tilestream/v1/layers/{layer}")
     get_layer (layer: String @1) -> Layer
 
+    @http.get("/tilestream/v1/layers:batch")
+    batch_get_layers(layers: [String] @1) -> [Layer]
+
     @http.get("/tilestream/v1/layers")
-    list_layers (prefix: String @1 //< prefix of layer name
-                 show_config: Bool @2)  //< show config of layer, hide layer config in most cases
+    @query
+    @pagination
+    list_layers (prefix: String @1) //< prefix of layer name
                  -> [Layer]
 }

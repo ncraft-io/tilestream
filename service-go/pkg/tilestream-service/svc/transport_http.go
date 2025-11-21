@@ -30,12 +30,12 @@ import (
 	"github.com/pkg/errors"
 
 	httptransport "github.com/go-kit/kit/transport/http"
-	mjhttp "github.com/mojo-lang/http/go/pkg/mojo/http"
-	pagination "github.com/ncraft-io/ncraft-gokit/pkg/pagination"
-	nhttp "github.com/ncraft-io/ncraft-gokit/pkg/transport/http"
+	mjhttp "github.com/mojo-lang/mojo/go/pkg/mojo/http"
+	pagination "github.com/ncraft-io/ncraft/go/pkg/gokit/pagination"
+	nhttp "github.com/ncraft-io/ncraft/go/pkg/gokit/transport/http"
 	stdopentracing "github.com/opentracing/opentracing-go"
 
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 
 	"github.com/ncraft-io/tilestream/go/pkg/tilestream"
 
@@ -62,6 +62,8 @@ var (
 	_ = core.Null{}
 	_ = tilestream.TileInfo{}
 	_ = tilestream.Layer{}
+	_ = core.Ordering{}
+	_ = core.FieldMask{}
 )
 
 var cfg *nhttp.Config
@@ -94,14 +96,6 @@ func RegisterHttpHandler(router *mux.Router, endpoints Endpoints, tracer stdopen
 			addTracerOption("create_tile")...,
 		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "create_tile", logger)))...,
 		))
-	router.Methods("POST").Path("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}").Handler(
-		httptransport.NewServer(
-			endpoints.CreateTileEndpoint,
-			DecodeHTTPCreateTileOneRequest,
-			EncodeHTTPGenericResponse,
-			addTracerOption("create_tile")...,
-		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "create_tile", logger)))...,
-		))
 
 	router.Methods("POST").Path("/tilestream/v1/layers/{layer}/tiles").Handler(
 		httptransport.NewServer(
@@ -120,14 +114,6 @@ func RegisterHttpHandler(router *mux.Router, endpoints Endpoints, tracer stdopen
 			addTracerOption("get_tile")...,
 		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "get_tile", logger)))...,
 		))
-	router.Methods("GET").Path("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}").Handler(
-		httptransport.NewServer(
-			endpoints.GetTileEndpoint,
-			DecodeHTTPGetTileOneRequest,
-			EncodeHTTPGenericResponse,
-			addTracerOption("get_tile")...,
-		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "get_tile", logger)))...,
-		))
 
 	router.Methods("GET").Path("/tilestream/v1/layers/{layer}/tile_info").Handler(
 		httptransport.NewServer(
@@ -142,14 +128,6 @@ func RegisterHttpHandler(router *mux.Router, endpoints Endpoints, tracer stdopen
 		httptransport.NewServer(
 			endpoints.UpdateTileEndpoint,
 			DecodeHTTPUpdateTileZeroRequest,
-			EncodeHTTPGenericResponse,
-			addTracerOption("update_tile")...,
-		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "update_tile", logger)))...,
-		))
-	router.Methods("PUT").Path("/tilestream/v1/layers/{layer}/tiles/{level}/{x}/{y}.{format}").Handler(
-		httptransport.NewServer(
-			endpoints.UpdateTileEndpoint,
-			DecodeHTTPUpdateTileOneRequest,
 			EncodeHTTPGenericResponse,
 			addTracerOption("update_tile")...,
 		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "update_tile", logger)))...,
@@ -173,6 +151,15 @@ func RegisterHttpHandler(router *mux.Router, endpoints Endpoints, tracer stdopen
 		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "create_layer", logger)))...,
 		))
 
+	router.Methods("POST").Path("/tilestream/v1/layers:batch").Handler(
+		httptransport.NewServer(
+			endpoints.BatchCreateLayerEndpoint,
+			DecodeHTTPBatchCreateLayerZeroRequest,
+			EncodeHTTPGenericResponse,
+			addTracerOption("batch_create_layer")...,
+		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "batch_create_layer", logger)))...,
+		))
+
 	router.Methods("PUT").Path("/tilestream/v1/layers/{id}").Handler(
 		httptransport.NewServer(
 			endpoints.UpdateLayerEndpoint,
@@ -180,6 +167,15 @@ func RegisterHttpHandler(router *mux.Router, endpoints Endpoints, tracer stdopen
 			EncodeHTTPGenericResponse,
 			addTracerOption("update_layer")...,
 		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "update_layer", logger)))...,
+		))
+
+	router.Methods("PUT").Path("/tilestream/v1/layers:batch").Handler(
+		httptransport.NewServer(
+			endpoints.BatchUpdateLayerEndpoint,
+			DecodeHTTPBatchUpdateLayerZeroRequest,
+			EncodeHTTPGenericResponse,
+			addTracerOption("batch_update_layer")...,
+		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "batch_update_layer", logger)))...,
 		))
 
 	router.Methods("DELETE").Path("/tilestream/v1/layers/{layer}").Handler(
@@ -198,6 +194,15 @@ func RegisterHttpHandler(router *mux.Router, endpoints Endpoints, tracer stdopen
 			EncodeHTTPGenericResponse,
 			addTracerOption("get_layer")...,
 		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "get_layer", logger)))...,
+		))
+
+	router.Methods("GET").Path("/tilestream/v1/layers:batch").Handler(
+		httptransport.NewServer(
+			endpoints.BatchGetLayersEndpoint,
+			DecodeHTTPBatchGetLayersZeroRequest,
+			EncodeHTTPGenericResponse,
+			addTracerOption("batch_get_layers")...,
+		//append(serverOptions, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "batch_get_layers", logger)))...,
 		))
 
 	router.Methods("GET").Path("/tilestream/v1/layers").Handler(
@@ -292,6 +297,14 @@ func errorEncoder(ctx context.Context, err error, w http.ResponseWriter) {
 func DecodeHTTPCreateTileZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.CreateTileRequest
 
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to CreateTileRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
+
 	// to support gzip input
 	var reader io.ReadCloser
 	var err error
@@ -360,85 +373,19 @@ func DecodeHTTPCreateTileZeroRequest(_ context.Context, r *http.Request) (interf
 	return &req, nil
 }
 
-// DecodeHTTPCreateTileOneRequest is a transport/http.DecodeRequestFunc that
-// decodes a JSON-encoded create_tile request from the HTTP request
-// body. Primarily useful in a server.
-func DecodeHTTPCreateTileOneRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req pb.CreateTileRequest
-
-	// to support gzip input
-	var reader io.ReadCloser
-	var err error
-	switch r.Header.Get("Content-Encoding") {
-	case "gzip":
-		reader, err = gzip.NewReader(r.Body)
-		defer reader.Close()
-		if err != nil {
-			return nil, nhttp.WrapError(err, 400, "failed to read the gzip content")
-		}
-	default:
-		reader = r.Body
-	}
-
-	buf, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, nhttp.WrapError(err, 400, "cannot read body of http request")
-	}
-	if len(buf) > 0 {
-		if err = jsoniter.ConfigFastest.Unmarshal(buf, &req); err != nil {
-			const size = 8196
-			if len(buf) > size {
-				buf = buf[:size]
-			}
-			return nil, nhttp.WrapError(err,
-				http.StatusBadRequest,
-				fmt.Sprintf("request body '%s': cannot parse non-json request body", buf),
-			)
-		}
-	}
-
-	pathParams := mux.Vars(r)
-	_ = pathParams
-
-	queryParams := core.NewUrlQueryFrom(r.URL.Query())
-	_ = queryParams
-
-	parsedQueryParams := make(map[string]bool)
-	_ = parsedQueryParams
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Format, "format")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the format  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Layer, "layer")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the layer  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Level, "level")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the level  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.X, "x")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the x  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Y, "y")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the y  query parameter")
-	}
-
-	return &req, nil
-}
-
 // DecodeHTTPBatchCreateTilesZeroRequest is a transport/http.DecodeRequestFunc that
 // decodes a JSON-encoded batch_create_tiles request from the HTTP request
 // body. Primarily useful in a server.
 func DecodeHTTPBatchCreateTilesZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.BatchCreateTilesRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to BatchCreateTilesRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
 
 	// to support gzip input
 	var reader io.ReadCloser
@@ -489,6 +436,14 @@ func DecodeHTTPBatchCreateTilesZeroRequest(_ context.Context, r *http.Request) (
 func DecodeHTTPGetTileZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.GetTileRequest
 
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to GetTileRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
+
 	// to support gzip input
 	var reader io.ReadCloser
 	var err error
@@ -557,85 +512,19 @@ func DecodeHTTPGetTileZeroRequest(_ context.Context, r *http.Request) (interface
 	return &req, nil
 }
 
-// DecodeHTTPGetTileOneRequest is a transport/http.DecodeRequestFunc that
-// decodes a JSON-encoded get_tile request from the HTTP request
-// body. Primarily useful in a server.
-func DecodeHTTPGetTileOneRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req pb.GetTileRequest
-
-	// to support gzip input
-	var reader io.ReadCloser
-	var err error
-	switch r.Header.Get("Content-Encoding") {
-	case "gzip":
-		reader, err = gzip.NewReader(r.Body)
-		defer reader.Close()
-		if err != nil {
-			return nil, nhttp.WrapError(err, 400, "failed to read the gzip content")
-		}
-	default:
-		reader = r.Body
-	}
-
-	buf, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, nhttp.WrapError(err, 400, "cannot read body of http request")
-	}
-	if len(buf) > 0 {
-		if err = jsoniter.ConfigFastest.Unmarshal(buf, &req); err != nil {
-			const size = 8196
-			if len(buf) > size {
-				buf = buf[:size]
-			}
-			return nil, nhttp.WrapError(err,
-				http.StatusBadRequest,
-				fmt.Sprintf("request body '%s': cannot parse non-json request body", buf),
-			)
-		}
-	}
-
-	pathParams := mux.Vars(r)
-	_ = pathParams
-
-	queryParams := core.NewUrlQueryFrom(r.URL.Query())
-	_ = queryParams
-
-	parsedQueryParams := make(map[string]bool)
-	_ = parsedQueryParams
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Format, "format")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the format  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Layer, "layer")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the layer  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Level, "level")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the level  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.X, "x")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the x  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Y, "y")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the y  query parameter")
-	}
-
-	return &req, nil
-}
-
 // DecodeHTTPGetTileInfoZeroRequest is a transport/http.DecodeRequestFunc that
 // decodes a JSON-encoded get_tile_info request from the HTTP request
 // body. Primarily useful in a server.
 func DecodeHTTPGetTileInfoZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.GetTileInfoRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to GetTileInfoRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
 
 	// to support gzip input
 	var reader io.ReadCloser
@@ -691,6 +580,14 @@ func DecodeHTTPGetTileInfoZeroRequest(_ context.Context, r *http.Request) (inter
 func DecodeHTTPUpdateTileZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.UpdateTileRequest
 
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to UpdateTileRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
+
 	// to support gzip input
 	var reader io.ReadCloser
 	var err error
@@ -776,102 +673,19 @@ func DecodeHTTPUpdateTileZeroRequest(_ context.Context, r *http.Request) (interf
 	return &req, nil
 }
 
-// DecodeHTTPUpdateTileOneRequest is a transport/http.DecodeRequestFunc that
-// decodes a JSON-encoded update_tile request from the HTTP request
-// body. Primarily useful in a server.
-func DecodeHTTPUpdateTileOneRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req pb.UpdateTileRequest
-
-	// to support gzip input
-	var reader io.ReadCloser
-	var err error
-	switch r.Header.Get("Content-Encoding") {
-	case "gzip":
-		reader, err = gzip.NewReader(r.Body)
-		defer reader.Close()
-		if err != nil {
-			return nil, nhttp.WrapError(err, 400, "failed to read the gzip content")
-		}
-	default:
-		reader = r.Body
-	}
-
-	buf, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, nhttp.WrapError(err, 400, "cannot read body of http request")
-	}
-	if len(buf) > 0 {
-		req.Tile = &tilestream.Tile{}
-		if err = jsoniter.ConfigFastest.Unmarshal(buf, req.Tile); err != nil {
-			const size = 8196
-			if len(buf) > size {
-				buf = buf[:size]
-			}
-			return nil, nhttp.WrapError(err,
-				http.StatusBadRequest,
-				fmt.Sprintf("request body '%s': cannot parse non-json request body", buf),
-			)
-		}
-	}
-
-	pathParams := mux.Vars(r)
-	_ = pathParams
-
-	queryParams := core.NewUrlQueryFrom(r.URL.Query())
-	_ = queryParams
-
-	parsedQueryParams := make(map[string]bool)
-	_ = parsedQueryParams
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Format, "format")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the format  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Layer, "layer")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the layer  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Level, "level")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the level  query parameter")
-	}
-
-	tileInitialized := false
-	if req.Tile == nil {
-		tileInitialized = true
-		req.Tile = &tilestream.Tile{}
-	}
-	err = mjhttp.UnmarshalQueryParam(queryParams, req.Tile, "tile")
-	if err != nil {
-		if core.IsNotFoundError(err) {
-			if tileInitialized {
-				req.Tile = nil
-			}
-		} else {
-			return nil, nhttp.WrapError(err, 400, "cannot unmarshal the tile  query parameter")
-		}
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.X, "x")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the x  query parameter")
-	}
-
-	err = mjhttp.UnmarshalPathParam(pathParams, &req.Y, "y")
-	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the y  query parameter")
-	}
-
-	return &req, nil
-}
-
 // DecodeHTTPUpdateTileInfoZeroRequest is a transport/http.DecodeRequestFunc that
 // decodes a JSON-encoded update_tile_info request from the HTTP request
 // body. Primarily useful in a server.
 func DecodeHTTPUpdateTileInfoZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.UpdateTileInfoRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to UpdateTileInfoRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
 
 	// to support gzip input
 	var reader io.ReadCloser
@@ -944,6 +758,14 @@ func DecodeHTTPUpdateTileInfoZeroRequest(_ context.Context, r *http.Request) (in
 func DecodeHTTPCreateLayerZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.CreateLayerRequest
 
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to CreateLayerRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
+
 	// to support gzip input
 	var reader io.ReadCloser
 	var err error
@@ -1004,11 +826,82 @@ func DecodeHTTPCreateLayerZeroRequest(_ context.Context, r *http.Request) (inter
 	return &req, nil
 }
 
+// DecodeHTTPBatchCreateLayerZeroRequest is a transport/http.DecodeRequestFunc that
+// decodes a JSON-encoded batch_create_layer request from the HTTP request
+// body. Primarily useful in a server.
+func DecodeHTTPBatchCreateLayerZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req pb.BatchCreateLayerRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to BatchCreateLayerRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
+
+	// to support gzip input
+	var reader io.ReadCloser
+	var err error
+	switch r.Header.Get("Content-Encoding") {
+	case "gzip":
+		reader, err = gzip.NewReader(r.Body)
+		defer reader.Close()
+		if err != nil {
+			return nil, nhttp.WrapError(err, 400, "failed to read the gzip content")
+		}
+	default:
+		reader = r.Body
+	}
+
+	buf, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, nhttp.WrapError(err, 400, "cannot read body of http request")
+	}
+	if len(buf) > 0 {
+		req.Layers = []*tilestream.Layer{}
+		if err = jsoniter.ConfigFastest.Unmarshal(buf, &req.Layers); err != nil {
+			const size = 8196
+			if len(buf) > size {
+				buf = buf[:size]
+			}
+			return nil, nhttp.WrapError(err,
+				http.StatusBadRequest,
+				fmt.Sprintf("request body '%s': cannot parse non-json request body", buf),
+			)
+		}
+	}
+
+	pathParams := mux.Vars(r)
+	_ = pathParams
+
+	queryParams := core.NewUrlQueryFrom(r.URL.Query())
+	_ = queryParams
+
+	parsedQueryParams := make(map[string]bool)
+	_ = parsedQueryParams
+
+	err = mjhttp.UnmarshalQueryParam(queryParams, &req.Layers, "layers")
+	if err != nil && !core.IsNotFoundError(err) {
+		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the layers  query parameter")
+	}
+
+	return &req, nil
+}
+
 // DecodeHTTPUpdateLayerZeroRequest is a transport/http.DecodeRequestFunc that
 // decodes a JSON-encoded update_layer request from the HTTP request
 // body. Primarily useful in a server.
 func DecodeHTTPUpdateLayerZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.UpdateLayerRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to UpdateLayerRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
 
 	// to support gzip input
 	var reader io.ReadCloser
@@ -1075,11 +968,82 @@ func DecodeHTTPUpdateLayerZeroRequest(_ context.Context, r *http.Request) (inter
 	return &req, nil
 }
 
+// DecodeHTTPBatchUpdateLayerZeroRequest is a transport/http.DecodeRequestFunc that
+// decodes a JSON-encoded batch_update_layer request from the HTTP request
+// body. Primarily useful in a server.
+func DecodeHTTPBatchUpdateLayerZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req pb.BatchUpdateLayerRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to BatchUpdateLayerRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
+
+	// to support gzip input
+	var reader io.ReadCloser
+	var err error
+	switch r.Header.Get("Content-Encoding") {
+	case "gzip":
+		reader, err = gzip.NewReader(r.Body)
+		defer reader.Close()
+		if err != nil {
+			return nil, nhttp.WrapError(err, 400, "failed to read the gzip content")
+		}
+	default:
+		reader = r.Body
+	}
+
+	buf, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, nhttp.WrapError(err, 400, "cannot read body of http request")
+	}
+	if len(buf) > 0 {
+		req.Layers = []*tilestream.Layer{}
+		if err = jsoniter.ConfigFastest.Unmarshal(buf, &req.Layers); err != nil {
+			const size = 8196
+			if len(buf) > size {
+				buf = buf[:size]
+			}
+			return nil, nhttp.WrapError(err,
+				http.StatusBadRequest,
+				fmt.Sprintf("request body '%s': cannot parse non-json request body", buf),
+			)
+		}
+	}
+
+	pathParams := mux.Vars(r)
+	_ = pathParams
+
+	queryParams := core.NewUrlQueryFrom(r.URL.Query())
+	_ = queryParams
+
+	parsedQueryParams := make(map[string]bool)
+	_ = parsedQueryParams
+
+	err = mjhttp.UnmarshalQueryParam(queryParams, &req.Layers, "layers")
+	if err != nil && !core.IsNotFoundError(err) {
+		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the layers  query parameter")
+	}
+
+	return &req, nil
+}
+
 // DecodeHTTPDeleteLayerZeroRequest is a transport/http.DecodeRequestFunc that
 // decodes a JSON-encoded delete_layer request from the HTTP request
 // body. Primarily useful in a server.
 func DecodeHTTPDeleteLayerZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.DeleteLayerRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to DeleteLayerRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
 
 	// to support gzip input
 	var reader io.ReadCloser
@@ -1135,6 +1099,14 @@ func DecodeHTTPDeleteLayerZeroRequest(_ context.Context, r *http.Request) (inter
 func DecodeHTTPGetLayerZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req pb.GetLayerRequest
 
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to GetLayerRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
+
 	// to support gzip input
 	var reader io.ReadCloser
 	var err error
@@ -1183,11 +1155,19 @@ func DecodeHTTPGetLayerZeroRequest(_ context.Context, r *http.Request) (interfac
 	return &req, nil
 }
 
-// DecodeHTTPListLayersZeroRequest is a transport/http.DecodeRequestFunc that
-// decodes a JSON-encoded list_layers request from the HTTP request
+// DecodeHTTPBatchGetLayersZeroRequest is a transport/http.DecodeRequestFunc that
+// decodes a JSON-encoded batch_get_layers request from the HTTP request
 // body. Primarily useful in a server.
-func DecodeHTTPListLayersZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req pb.ListLayersRequest
+func DecodeHTTPBatchGetLayersZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req pb.BatchGetLayersRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to BatchGetLayersRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
 
 	// to support gzip input
 	var reader io.ReadCloser
@@ -1229,14 +1209,128 @@ func DecodeHTTPListLayersZeroRequest(_ context.Context, r *http.Request) (interf
 	parsedQueryParams := make(map[string]bool)
 	_ = parsedQueryParams
 
+	err = mjhttp.UnmarshalQueryParam(queryParams, &req.Layers, "layers")
+	if err != nil && !core.IsNotFoundError(err) {
+		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the layers  query parameter")
+	}
+
+	return &req, nil
+}
+
+// DecodeHTTPListLayersZeroRequest is a transport/http.DecodeRequestFunc that
+// decodes a JSON-encoded list_layers request from the HTTP request
+// body. Primarily useful in a server.
+func DecodeHTTPListLayersZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req pb.ListLayersRequest
+
+	ri := interface{}(&req)
+	if decoder, ok := ri.(nhttp.RequestDecoder); ok {
+		if err := decoder.DecodeHttpRequest(r); err != nil {
+			return nil, nhttp.WrapError(err, 400, fmt.Sprintf("cannot decode the request to ListLayersRequest by customized RequestDecoder, err:%s", err.Error()))
+		}
+		return &req, nil
+	}
+
+	// to support gzip input
+	var reader io.ReadCloser
+	var err error
+	switch r.Header.Get("Content-Encoding") {
+	case "gzip":
+		reader, err = gzip.NewReader(r.Body)
+		defer reader.Close()
+		if err != nil {
+			return nil, nhttp.WrapError(err, 400, "failed to read the gzip content")
+		}
+	default:
+		reader = r.Body
+	}
+
+	buf, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, nhttp.WrapError(err, 400, "cannot read body of http request")
+	}
+	if len(buf) > 0 {
+		if err = jsoniter.ConfigFastest.Unmarshal(buf, &req); err != nil {
+			const size = 8196
+			if len(buf) > size {
+				buf = buf[:size]
+			}
+			return nil, nhttp.WrapError(err,
+				http.StatusBadRequest,
+				fmt.Sprintf("request body '%s': cannot parse non-json request body", buf),
+			)
+		}
+	}
+
+	pathParams := mux.Vars(r)
+	_ = pathParams
+
+	queryParams := core.NewUrlQueryFrom(r.URL.Query())
+	_ = queryParams
+
+	parsedQueryParams := make(map[string]bool)
+	_ = parsedQueryParams
+
+	fieldMaskInitialized := false
+	if req.FieldMask == nil {
+		fieldMaskInitialized = true
+		req.FieldMask = &core.FieldMask{}
+	}
+	err = mjhttp.UnmarshalQueryParam(queryParams, req.FieldMask, "field_mask")
+	if err != nil {
+		if core.IsNotFoundError(err) {
+			if fieldMaskInitialized {
+				req.FieldMask = nil
+			}
+		} else {
+			return nil, nhttp.WrapError(err, 400, "cannot unmarshal the field_mask  query parameter")
+		}
+	}
+
+	err = mjhttp.UnmarshalQueryParam(queryParams, &req.Filter, "filter")
+	if err != nil && !core.IsNotFoundError(err) {
+		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the filter  query parameter")
+	}
+
+	orderInitialized := false
+	if req.Order == nil {
+		orderInitialized = true
+		req.Order = &core.Ordering{}
+	}
+	err = mjhttp.UnmarshalQueryParam(queryParams, req.Order, "order")
+	if err != nil {
+		if core.IsNotFoundError(err) {
+			if orderInitialized {
+				req.Order = nil
+			}
+		} else {
+			return nil, nhttp.WrapError(err, 400, "cannot unmarshal the order  query parameter")
+		}
+	}
+
+	err = mjhttp.UnmarshalQueryParam(queryParams, &req.PageSize, "page_size")
+	if err != nil && !core.IsNotFoundError(err) {
+		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the page_size  query parameter")
+	}
+
+	err = mjhttp.UnmarshalQueryParam(queryParams, &req.PageToken, "page_token")
+	if err != nil && !core.IsNotFoundError(err) {
+		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the page_token  query parameter")
+	}
+
 	err = mjhttp.UnmarshalQueryParam(queryParams, &req.Prefix, "prefix")
 	if err != nil && !core.IsNotFoundError(err) {
 		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the prefix  query parameter")
 	}
 
-	err = mjhttp.UnmarshalQueryParam(queryParams, &req.ShowConfig, "show_config")
+	err = mjhttp.UnmarshalQueryParam(queryParams, &req.Skip, "skip")
 	if err != nil && !core.IsNotFoundError(err) {
-		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the show_config  query parameter")
+		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the skip  query parameter")
+	}
+
+	err = mjhttp.UnmarshalQueryParam(queryParams, &req.Unique, "unique")
+	if err != nil && !core.IsNotFoundError(err) {
+		return nil, nhttp.WrapError(err, 400, "cannot unmarshal the unique  query parameter")
 	}
 
 	return &req, nil
@@ -1341,6 +1435,22 @@ func headersToContext(ctx context.Context, r *http.Request) context.Context {
 	accessKey := r.URL.Query().Get("access_key")
 	if len(accessKey) > 0 {
 		ctx = context.WithValue(ctx, "access_key", accessKey)
+	}
+
+	// Authorization header
+	if auth := r.Header.Get("Authorization"); len(auth) > 0 {
+		if strings.HasPrefix(auth, "Bearer") {
+			auth = strings.TrimSpace(strings.TrimPrefix(auth, "Bearer"))
+			ctx = context.WithValue(ctx, "bearer_token", auth)
+		} else if strings.HasPrefix(auth, "Basic") {
+			auth = strings.TrimSpace(strings.TrimPrefix(auth, "Basic"))
+			ctx = context.WithValue(ctx, "basic_token", auth)
+		}
+	}
+
+	// Authorization cookie
+	if cookie, err := r.Cookie("auth_token"); err == nil && cookie != nil {
+		ctx = context.WithValue(ctx, "auth_token", cookie.Value)
 	}
 
 	// Tune specific change.

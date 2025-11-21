@@ -1,0 +1,36 @@
+{
+    "title": "tilestream.providers.postgis.Config",
+    "description": "",
+    "type": "object",
+    "properties": {
+        "bounds": {
+            "$ref": "#/components/schemas/mojo.geom.BoundingBox"
+        },
+        "debug": {
+            "title": "mojo.core.Bool",
+            "type": "boolean"
+        },
+        "maxZoom": {
+            "title": "mojo.core.Int64",
+            "type": "integer",
+            "format": "Int64"
+        },
+        "minZoom": {
+            "title": "mojo.core.Int64",
+            "type": "integer",
+            "format": "Int64"
+        },
+        "name": {
+            "title": "mojo.core.String",
+            "type": "string"
+        },
+        "provider": {
+            "$ref": "#/components/schemas/tilestream.providers.postgis.Config.Provider"
+        },
+        "tileBuffer": {
+            "title": "mojo.core.Int64",
+            "type": "integer",
+            "format": "Int64"
+        }
+    }
+}

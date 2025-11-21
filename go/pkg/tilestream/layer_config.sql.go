@@ -5,25 +5,27 @@ package tilestream
 
 import (
 	"database/sql/driver"
-	"github.com/mojo-lang/db/go/pkg/mojo/db"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/db"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
 
-func (x *LayerConfig) Value() (driver.Value, error) {
+func (x LayerConfig) Value() (driver.Value, error) {
 	return db.JSONValuer{}.Value(x.Object)
-
 }
 
 func (x *LayerConfig) Scan(value interface{}) error {
-	return db.JSONScanner{}.Scan(&x.Object, value)
+	if x.Object == nil {
+		x.Init()
+	}
+	return db.JSONScanner{}.Scan(x.Object, value)
 
 }
 
-func (x *LayerConfig) GormDBDataType(gdb *gorm.DB, field *schema.Field) string {
+func (x LayerConfig) GormDBDataType(gdb *gorm.DB, field *schema.Field) string {
 	return db.JSONDbDataType{}.GormDBDataType(gdb, field)
 }
 
-func (x *LayerConfig) GormDataType() string {
+func (x LayerConfig) GormDataType() string {
 	return "string"
 }

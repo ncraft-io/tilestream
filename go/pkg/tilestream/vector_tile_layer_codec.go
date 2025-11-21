@@ -1,8 +1,8 @@
 package tilestream
 
 import (
-	"github.com/mojo-lang/core/go/pkg/mojo/core"
-	"github.com/mojo-lang/geom/go/pkg/mojo/geom"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/geom"
 )
 
 func EncodeLayer(name string, feats []*geom.Feature, tid *TileId, extent uint32) *VectorTile_Layer {

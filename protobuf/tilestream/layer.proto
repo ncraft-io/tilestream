@@ -20,6 +20,7 @@ message Layer {
     bool templated = 4;
     mojo.core.Object config = 5 [(mojo.db_json)=true];
     string description = 6;
+    string original_id = 10;
     mojo.core.Timestamp create_time = 100;
     mojo.core.Timestamp update_time = 101;
 }
