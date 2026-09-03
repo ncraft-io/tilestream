@@ -2,6 +2,7 @@ package tilestream
 
 import (
 	"context"
+	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
 )
 
 type TileWriter interface {
@@ -40,7 +41,7 @@ type TileWriter interface {
 	// Therefore, users MUST NOT rely on this function to persist changes.
 	// If you want to make sure that all changes are persisted, call
 	// .StopWriting().
-	WriteTile(ctx context.Context, x, y, z int32, tile []byte) error
+	WriteTile(ctx context.Context, x, y, z int32, tile []byte, options core.Options) error
 
 	// WriteInfo Stores metadata into the tile writer. Info is a key-value hash with metadata.
 	// Implementations may decide to reject invalid keys.

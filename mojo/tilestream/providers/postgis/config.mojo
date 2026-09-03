@@ -18,6 +18,15 @@ type Config {
         sql: Sql @4
     }
 
+    type Cluster {
+        eps: Float32 @1
+        min_points: Int32 @2
+        group_bys: [String] @3 //< group by fields
+
+        min_zoom: Int @10 //< optional, recommend min zoom
+        max_zoom: Int @11 //< optional, recommend max zoom
+    }
+
     debug: Bool @1
     name: String @2
 
@@ -27,4 +36,5 @@ type Config {
 
     tile_buffer: Int @7
     provider: Provider @10
+    clusters: [Cluster] @11
 }

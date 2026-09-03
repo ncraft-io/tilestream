@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/mojo-lang/mojo/go/pkg/mojo/core"
+	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
 	"github.com/ncraft-io/tilestream/go/pkg/tilestream"
 	"github.com/ncraft-io/tilestream/service-go/pkg/model"
 	"github.com/segmentio/ksuid"
@@ -10,6 +11,7 @@ import (
 
 	ts "github.com/ncraft-io/tilestream/service-go/pkg/tilestream"
 
+	_ "github.com/ncraft-io/tilestream/service-go/pkg/tilestream/pgsql"
 	_ "github.com/ncraft-io/tilestream/service-go/pkg/tilestream/postgis"
 
 	// this service api
@@ -70,55 +72,34 @@ func (s tilestreamServer) GetTile(ctx context.Context, in *pb.GetTileRequest) (*
 	instance := GetTileStream()
 
 	ccCtx := ctx
-	if instance.Cache != nil {
-		if hashKey := getHashKey(ctx); len(hashKey) > 0 {
-			ccCtx = context.WithValue(ccCtx, "hash_key", hashKey)
-		}
-		ccCtx = context.WithValue(ccCtx, "layer", in.Layer)
+	hashKey := getHashKey(ctx)
+	if len(hashKey) > 0 {
+		ccCtx = context.WithValue(ccCtx, "hash_key", hashKey)
+	}
+	ccCtx = context.WithValue(ccCtx, "layer", in.Layer)
 
-		if tile, _, err := instance.Cache.Tile(ccCtx, in.GetX(), in.GetY(), in.GetLevel()); err == nil && len(tile) > 0 {
-			return &tilestream.Tile{
-				X:       in.GetX(),
-				Y:       in.GetY(),
-				Level:   in.GetLevel(),
-				Content: tile,
-				Format:  in.Format,
-			}, nil
+	if instance.Cache != nil {
+		tile, options, err := instance.Cache.Tile(ccCtx, in.GetX(), in.GetY(), in.GetLevel())
+		if err == nil && len(tile) > 0 {
+			logs.Debugw("get the tile from cache", "layer", in.Layer, "x", in.GetX(), "y", in.GetX(), "level", in.GetLevel())
+			return tilestream.NewTile(in.GetX(), in.GetY(), in.GetLevel(), tile, options), nil
 		}
 	}
 
-	st := instance.Get(in.Layer)
+	st := instance.Get(in.Layer, hashKey)
 	if st == nil {
 		return nil, core.NewInvalidArgumentError("The layer %s is exist", in.GetLayer())
 	}
-	tile, options, err := st.Tile(ctx, in.GetX(), in.GetY(), in.GetLevel())
+	tile, options, err := st.Tile(ccCtx, in.GetX(), in.GetY(), in.GetLevel())
 	if err != nil {
 		return nil, err
 	}
 
 	if instance.Cache != nil {
-		_ = instance.Cache.WriteTile(ccCtx, in.GetX(), in.GetY(), in.GetLevel(), tile)
+		_ = instance.Cache.WriteTile(ccCtx, in.GetX(), in.GetY(), in.GetLevel(), tile, options)
 	}
 
-	t := &tilestream.Tile{
-		X:       in.GetX(),
-		Y:       in.GetY(),
-		Level:   in.GetLevel(),
-		Content: tile,
-	}
-
-	format := options.GetString("Format")
-	if len(format) > 0 {
-		t.Format = format
-	} else {
-
-	}
-
-	encoding := options.GetString("Content-Encoding")
-	if len(encoding) > 0 {
-		t.Encoding = encoding
-	}
-
+	t := tilestream.NewTile(in.GetX(), in.GetY(), in.GetLevel(), tile, options)
 	return t, nil
 
 	//return nil, core.NewNotFoundError("failed to found the tile %s(%d,%d,%d)", in.GetLevel(), in.GetX(), in.GetY(), in.GetLevel())
@@ -177,7 +158,7 @@ func (s tilestreamServer) CreateLayer(ctx context.Context, in *pb.CreateLayerReq
 	}
 
 	if len(in.Layer.OriginalId) == 0 {
-		if layer, _ := model.NewLayer().Get(ctx, in.Layer.Name); layer != nil {
+		if layer, _ := model.GetLayer().Get(ctx, in.Layer.Name); layer != nil {
 			in.Layer.Id = layer.Id
 			in.Layer.CreateTime = layer.CreateTime
 		}
@@ -191,6 +172,7 @@ func (s tilestreamServer) CreateLayer(ctx context.Context, in *pb.CreateLayerReq
 	}
 
 	in.Layer.UpdateTime = core.Now()
+	in.Layer.HashKey = in.Layer.VTileHash()
 
 	if _, err := model.GetLayer().Create(ctx, in.Layer); err != nil {
 		return nil, core.NewInternalError("failed to save the layer to database, error: %s", err.Error())
@@ -221,11 +203,12 @@ func (s tilestreamServer) UpdateLayer(ctx context.Context, in *pb.UpdateLayerReq
 		in.Layer.Id = in.Id
 	}
 
-	var dbLayer *tilestream.Layer
+	//var dbLayer *tilestream.Layer
 	if l, err := model.NewLayer().Get(ctx, in.Layer.Id); err != nil {
 		return nil, core.NewInvalidArgumentError("the layer id (%s) is not found", in.Layer.Id)
 	} else {
-		dbLayer = l
+		//dbLayer = l
+		_ = l
 	}
 
 	if in.Layer.Config.Object != nil {
@@ -237,18 +220,18 @@ func (s tilestreamServer) UpdateLayer(ctx context.Context, in *pb.UpdateLayerReq
 			return nil, core.NewInvalidArgumentError("the layer's config is invalid")
 		}
 		in.Layer.UpdateTime = core.Now()
+		in.Layer.HashKey = in.Layer.VTileHash()
 		if _, err := model.GetLayer().Update(ctx, in.Layer); err != nil {
 			return nil, core.NewInternalError("failed to save the layer to database, error: %s", err.Error())
 		}
 
-		{
-			instance := GetTileStream()
-			instance.Delete(in.Layer.Id)
-			if len(dbLayer.OriginalId) == 0 {
-				instance.Delete(in.Layer.Name)
-			}
-
-		}
+		//{
+		//	instance := GetTileStream()
+		//	instance.Delete(in.Layer.Id)
+		//	if len(dbLayer.OriginalId) == 0 {
+		//		instance.Delete(in.Layer.Name)
+		//	}
+		//}
 	}
 	return &core.Null{}, nil
 }
@@ -259,10 +242,10 @@ func (s tilestreamServer) DeleteLayer(ctx context.Context, in *pb.DeleteLayerReq
 		return nil, core.NewInvalidArgumentError("the layer id is empty")
 	}
 
-	{
-		instance := GetTileStream()
-		instance.Delete(in.Layer)
-	}
+	//{
+	//	instance := GetTileStream()
+	//	instance.Delete(in.Layer)
+	//}
 
 	if _, err := model.NewLayer().Delete(ctx, in.Layer); err != nil {
 		return nil, core.NewInvalidArgumentError("failed to delete the layer (%s)", in.Layer)
@@ -277,7 +260,7 @@ func (s tilestreamServer) GetLayer(ctx context.Context, in *pb.GetLayerRequest) 
 		return nil, core.NewInvalidArgumentError("the layer id is empty")
 	}
 
-	if layer, err := model.NewLayer().Get(ctx, in.Layer); err != nil {
+	if layer, err := model.GetLayer().Get(ctx, in.Layer); err != nil {
 		return nil, core.NewInvalidArgumentError("the layer id (%s) is not found", in.Layer)
 	} else {
 		return layer, nil
@@ -307,18 +290,19 @@ func (s tilestreamServer) BatchUpdateLayer(ctx context.Context, in *pb.BatchUpda
 		ids = append(ids, layer.Id+":"+layer.Name)
 	}
 
-	{
-		instance := GetTileStream()
-
-		for _, layer := range in.Layers {
-			instance.Delete(layer.Id)
-			if len(layer.OriginalId) == 0 {
-				instance.Delete(layer.Name)
-			}
-		}
-	}
+	//{
+	//	instance := GetTileStream()
+	//
+	//	for _, layer := range in.Layers {
+	//		instance.Delete(layer.Id)
+	//		if len(layer.OriginalId) == 0 {
+	//			instance.Delete(layer.Name)
+	//		}
+	//	}
+	//}
 
 	for _, layer := range in.Layers {
+		layer.HashKey = layer.VTileHash()
 		_, err := model.GetLayer().Update(ctx, layer)
 		if err != nil {
 			return nil, core.NewInternalError("failed to update layers (%v) err: %s", ids, err.Error())
@@ -386,6 +370,7 @@ func (s tilestreamServer) BatchCreateLayer(ctx context.Context, in *pb.BatchCrea
 			layer.CreateTime = core.Now()
 		}
 
+		layer.HashKey = layer.VTileHash()
 		layer.UpdateTime = core.Now()
 	}
 

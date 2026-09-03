@@ -7,6 +7,7 @@ import (
 	"github.com/ncraft-io/ncraft/go/pkg/ncraft/redis"
 	_ "github.com/ncraft-io/ncraft/go/pkg/ncraft/redis/goredis"
 	ts "github.com/ncraft-io/tilestream/go/pkg/tilestream"
+	"google.golang.org/protobuf/proto"
 	"time"
 )
 
@@ -52,11 +53,21 @@ func getToken(ctx context.Context, x, y, level int32) string {
 
 func (c *Cache) Tile(ctx context.Context, x, y, level int32) ([]byte, core.Options, error) {
 	if key := getToken(ctx, x, y, level); len(key) > 0 {
-		tile, err := redis.Get(c.Redis, key)
+		data, err := redis.Get(c.Redis, key)
 		if err != nil {
 			return nil, nil, err
 		}
-		return []byte(tile), nil, nil
+		tile := &ts.Tile{}
+		if err = proto.Unmarshal([]byte(data), tile); err != nil {
+			return nil, nil, err
+		}
+
+		if len(tile.Content) == 0 {
+			_, _ = redis.Del(c.Redis, key)
+			return nil, nil, nil
+		}
+
+		return tile.Content, tile.GetOptions(), nil
 	}
 	return nil, nil, errors.New("the tile key is empty")
 }
@@ -73,9 +84,15 @@ func (c *Cache) StopWriting(ctx context.Context) error {
 	return nil
 }
 
-func (c *Cache) WriteTile(ctx context.Context, x, y, level int32, tile []byte) error {
+func (c *Cache) WriteTile(ctx context.Context, x, y, level int32, tile []byte, options core.Options) error {
 	if token := getToken(ctx, x, y, level); len(token) > 0 {
-		_, err := redis.SetEx(c.Redis, token, string(tile), c.Expiration.ToDuration())
+		vt := ts.NewTile(x, y, level, tile, options)
+		data, err := proto.Marshal(vt)
+		if err != nil {
+			return err
+		}
+
+		_, err = redis.SetEx(c.Redis, token, string(data), c.Expiration.ToDuration())
 		return err
 	}
 	return nil

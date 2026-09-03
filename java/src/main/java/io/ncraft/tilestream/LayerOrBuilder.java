@@ -79,6 +79,18 @@ public interface LayerOrBuilder extends
       getDescriptionBytes();
 
   /**
+   * <code>string hash_key = 9;</code>
+   * @return The hashKey.
+   */
+  java.lang.String getHashKey();
+  /**
+   * <code>string hash_key = 9;</code>
+   * @return The bytes for hashKey.
+   */
+  com.google.protobuf.ByteString
+      getHashKeyBytes();
+
+  /**
    * <code>string original_id = 10;</code>
    * @return The originalId.
    */

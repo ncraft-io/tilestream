@@ -28,13 +28,13 @@ func Copy(src, dest string, geometry *geom.Geometry, minLevel, maxLevel int32) (
 			break
 		}
 
-		tile, _, err := ss.Tile(context.Background(), tid.X, tid.Y, tid.Level)
+		tile, options, err := ss.Tile(context.Background(), tid.X, tid.Y, tid.Level)
 		if err != nil {
 			logs.Warnw("failed to read the tile from the src tilestream", "tid", tid, "src", src)
 			continue
 		}
 
-		err = ds.WriteTile(context.Background(), tid.X, tid.Y, tid.Level, tile)
+		err = ds.WriteTile(context.Background(), tid.X, tid.Y, tid.Level, tile, options)
 		if err != nil {
 			logs.Warnw("failed to write the tile to dest tilestream", "tid", tid, "dest", dest)
 			continue

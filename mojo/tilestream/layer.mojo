@@ -8,6 +8,8 @@ type Layer {
     config: Object @5 @db.json
     description: String @6
 
+    hash_key: String @9
+
     original_id: String @10 //< copied layer from original layer id
 
     create_time: Timestamp @100

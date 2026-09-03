@@ -11,6 +11,8 @@ import (
 	"text/template"
 )
 
+//{"name": "shanghai_poi", "bounds": {"rightTop": {"latitude": 31.868072, "longitude": 122.23999}, "leftBottom": {"latitude": 30.633466, "longitude": 120.857371}}, "maxZoom": 19, "minZoom": 3, "provider": {"sql": {"fields": [{"name": "name"}, {"name": "address"}, {"name": "category1"}, {"name": "category2"}, {"name": "category3"}]}, "idField": "id", "geometryField": "geometry"}}
+
 type AtlasConfig struct {
 	Debug     bool   `json:"debug"`
 	MapName   string `json:"mapName"`

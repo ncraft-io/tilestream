@@ -117,7 +117,7 @@ func (s *TileStream) StopWriting(ctx context.Context) error {
 	return errors.New("not implemented")
 }
 
-func (s *TileStream) WriteTile(ctx context.Context, x, y, z int32, tile []byte) error {
+func (s *TileStream) WriteTile(ctx context.Context, x, y, z int32, tile []byte, options core.Options) error {
 	return errors.New("not implemented")
 }
 

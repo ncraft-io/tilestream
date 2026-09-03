@@ -55,7 +55,11 @@ func (x *Config) ToObject() *core.Object {
 }
 
 func (x *Config) SetFilter(filter string) *Config {
-	if x != nil && x.Provider != nil && x.Provider.Sql != nil {
+	if x != nil && x.Provider != nil {
+		if x.Provider.Sql == nil {
+			x.Provider.Sql = &Config_Sql{}
+		}
+
 		x.Provider.Sql.Filter = filter
 	}
 	return x

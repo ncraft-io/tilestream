@@ -110,7 +110,7 @@ func (k *Kv) StopWriting(ctx context.Context) error {
 	return nil
 }
 
-func (k *Kv) WriteTile(ctx context.Context, x, y, level int32, tile []byte) error {
+func (k *Kv) WriteTile(ctx context.Context, x, y, level int32, tile []byte, options core.Options) error {
 	token := getToken(x, y, level)
 	return k.Store.Put(ctx, []byte(token), tile)
 }

@@ -103,6 +103,12 @@ func New(options core.Options) (*Postgis, error) {
 }
 
 func (p *Postgis) Tile(ctx context.Context, x, y, level int32) ([]byte, core.Options, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			logs.Errorf("failed to get tile from postgis engine", "panic", r)
+		}
+	}()
+
 	// lookup our Map
 	m, err := p.Atlas.Map(p.Config.MapName)
 	if err != nil {
@@ -143,7 +149,6 @@ func (p *Postgis) Tile(ctx context.Context, x, y, level int32) ([]byte, core.Opt
 		"Content-Type", "application/vnd.mapbox-vector-tile",
 		"Content-Encoding", "gzip",
 	)
-
 	return b, options, nil
 }
 
@@ -159,7 +164,7 @@ func (p *Postgis) StopWriting(ctx context.Context) error {
 	return errors.New("not implemented")
 }
 
-func (p *Postgis) WriteTile(ctx context.Context, x, y, z int32, tile []byte) error {
+func (p *Postgis) WriteTile(ctx context.Context, x, y, z int32, tile []byte, options core.Options) error {
 	return errors.New("not implemented")
 }
 

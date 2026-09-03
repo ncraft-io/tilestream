@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"github.com/hashicorp/golang-lru/v2/expirable"
+	"sync"
+	"time"
+
 	"github.com/ncraft-io/tilestream/service-go/pkg/tilestream"
 	"github.com/ncraft-io/tilestream/service-go/pkg/tilestream/cache"
-	"sync"
 )
 
 var streamOnce sync.Once
@@ -18,30 +21,28 @@ func GetTileStream() *TileStream {
 }
 
 type TileStream struct {
-	TileStreams sync.Map
+	TileStreams *expirable.LRU[string, tilestream.TileStream]
 	Cache       *cache.Cache
 }
 
 func NewTileStream() *TileStream {
 	return &TileStream{
-		Cache: cache.New(cache.NewConfig()),
+		TileStreams: expirable.NewLRU[string, tilestream.TileStream](100, nil, time.Hour*12),
+		Cache:       cache.New(cache.NewConfig()),
 	}
 }
 
-func (t *TileStream) Get(layer string) tilestream.TileStream {
-	if st, ok := t.TileStreams.Load(layer); ok {
-		return st.(tilestream.TileStream)
+func (t *TileStream) Get(layer string, hashkey string) tilestream.TileStream {
+	key := layer + "/" + hashkey
+	if st, ok := t.TileStreams.Get(key); ok {
+		return st
 	} else {
 		s := tilestream.NewTileStream(layer)
 		if s == nil {
 			return nil
 		}
 
-		t.TileStreams.Store(layer, s)
+		t.TileStreams.Add(key, s)
 		return s
 	}
-}
-
-func (t *TileStream) Delete(layer string) {
-	t.TileStreams.Delete(layer)
 }

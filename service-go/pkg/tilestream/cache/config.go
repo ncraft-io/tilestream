@@ -13,7 +13,6 @@ type Config struct {
 }
 
 func NewConfig() core.Options {
-	config.Get("cache")
 	var conf Config
 	if err := config.ScanFrom(&conf, "cache"); err != nil {
 		logs.ErrLogw("failed to load the tile cache config", "error", err)

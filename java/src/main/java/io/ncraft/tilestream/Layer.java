@@ -31,6 +31,7 @@ private static final long serialVersionUID = 0L;
     name_ = "";
     type_ = "";
     description_ = "";
+    hashKey_ = "";
     originalId_ = "";
   }
 
@@ -241,6 +242,45 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int HASH_KEY_FIELD_NUMBER = 9;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object hashKey_ = "";
+  /**
+   * <code>string hash_key = 9;</code>
+   * @return The hashKey.
+   */
+  @java.lang.Override
+  public java.lang.String getHashKey() {
+    java.lang.Object ref = hashKey_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      hashKey_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string hash_key = 9;</code>
+   * @return The bytes for hashKey.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getHashKeyBytes() {
+    java.lang.Object ref = hashKey_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      hashKey_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   public static final int ORIGINAL_ID_FIELD_NUMBER = 10;
   @SuppressWarnings("serial")
   private volatile java.lang.Object originalId_ = "";
@@ -364,6 +404,9 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(description_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 6, description_);
     }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(hashKey_)) {
+      com.google.protobuf.GeneratedMessage.writeString(output, 9, hashKey_);
+    }
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(originalId_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 10, originalId_);
     }
@@ -401,6 +444,9 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(description_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(6, description_);
+    }
+    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(hashKey_)) {
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(9, hashKey_);
     }
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(originalId_)) {
       size += com.google.protobuf.GeneratedMessage.computeStringSize(10, originalId_);
@@ -443,6 +489,8 @@ private static final long serialVersionUID = 0L;
     }
     if (!getDescription()
         .equals(other.getDescription())) return false;
+    if (!getHashKey()
+        .equals(other.getHashKey())) return false;
     if (!getOriginalId()
         .equals(other.getOriginalId())) return false;
     if (hasCreateTime() != other.hasCreateTime()) return false;
@@ -481,6 +529,8 @@ private static final long serialVersionUID = 0L;
     }
     hash = (37 * hash) + DESCRIPTION_FIELD_NUMBER;
     hash = (53 * hash) + getDescription().hashCode();
+    hash = (37 * hash) + HASH_KEY_FIELD_NUMBER;
+    hash = (53 * hash) + getHashKey().hashCode();
     hash = (37 * hash) + ORIGINAL_ID_FIELD_NUMBER;
     hash = (53 * hash) + getOriginalId().hashCode();
     if (hasCreateTime()) {
@@ -640,6 +690,7 @@ private static final long serialVersionUID = 0L;
         configBuilder_ = null;
       }
       description_ = "";
+      hashKey_ = "";
       originalId_ = "";
       createTime_ = null;
       if (createTimeBuilder_ != null) {
@@ -707,15 +758,18 @@ private static final long serialVersionUID = 0L;
         result.description_ = description_;
       }
       if (((from_bitField0_ & 0x00000040) != 0)) {
-        result.originalId_ = originalId_;
+        result.hashKey_ = hashKey_;
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
+        result.originalId_ = originalId_;
+      }
+      if (((from_bitField0_ & 0x00000100) != 0)) {
         result.createTime_ = createTimeBuilder_ == null
             ? createTime_
             : createTimeBuilder_.build();
         to_bitField0_ |= 0x00000002;
       }
-      if (((from_bitField0_ & 0x00000100) != 0)) {
+      if (((from_bitField0_ & 0x00000200) != 0)) {
         result.updateTime_ = updateTimeBuilder_ == null
             ? updateTime_
             : updateTimeBuilder_.build();
@@ -762,9 +816,14 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000020;
         onChanged();
       }
+      if (!other.getHashKey().isEmpty()) {
+        hashKey_ = other.hashKey_;
+        bitField0_ |= 0x00000040;
+        onChanged();
+      }
       if (!other.getOriginalId().isEmpty()) {
         originalId_ = other.originalId_;
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
       }
       if (other.hasCreateTime()) {
@@ -831,23 +890,28 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000020;
               break;
             } // case 50
+            case 74: {
+              hashKey_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000040;
+              break;
+            } // case 74
             case 82: {
               originalId_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000040;
+              bitField0_ |= 0x00000080;
               break;
             } // case 82
             case 802: {
               input.readMessage(
                   getCreateTimeFieldBuilder().getBuilder(),
                   extensionRegistry);
-              bitField0_ |= 0x00000080;
+              bitField0_ |= 0x00000100;
               break;
             } // case 802
             case 810: {
               input.readMessage(
                   getUpdateTimeFieldBuilder().getBuilder(),
                   extensionRegistry);
-              bitField0_ |= 0x00000100;
+              bitField0_ |= 0x00000200;
               break;
             } // case 810
             default: {
@@ -1308,6 +1372,78 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
+    private java.lang.Object hashKey_ = "";
+    /**
+     * <code>string hash_key = 9;</code>
+     * @return The hashKey.
+     */
+    public java.lang.String getHashKey() {
+      java.lang.Object ref = hashKey_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        hashKey_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string hash_key = 9;</code>
+     * @return The bytes for hashKey.
+     */
+    public com.google.protobuf.ByteString
+        getHashKeyBytes() {
+      java.lang.Object ref = hashKey_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        hashKey_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string hash_key = 9;</code>
+     * @param value The hashKey to set.
+     * @return This builder for chaining.
+     */
+    public Builder setHashKey(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      hashKey_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string hash_key = 9;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearHashKey() {
+      hashKey_ = getDefaultInstance().getHashKey();
+      bitField0_ = (bitField0_ & ~0x00000040);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string hash_key = 9;</code>
+     * @param value The bytes for hashKey to set.
+     * @return This builder for chaining.
+     */
+    public Builder setHashKeyBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      hashKey_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+
     private java.lang.Object originalId_ = "";
     /**
      * <code>string original_id = 10;</code>
@@ -1351,7 +1487,7 @@ private static final long serialVersionUID = 0L;
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       originalId_ = value;
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
@@ -1361,7 +1497,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder clearOriginalId() {
       originalId_ = getDefaultInstance().getOriginalId();
-      bitField0_ = (bitField0_ & ~0x00000040);
+      bitField0_ = (bitField0_ & ~0x00000080);
       onChanged();
       return this;
     }
@@ -1375,7 +1511,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       originalId_ = value;
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
@@ -1388,7 +1524,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the createTime field is set.
      */
     public boolean hasCreateTime() {
-      return ((bitField0_ & 0x00000080) != 0);
+      return ((bitField0_ & 0x00000100) != 0);
     }
     /**
      * <code>.mojo.core.Timestamp create_time = 100;</code>
@@ -1413,7 +1549,7 @@ private static final long serialVersionUID = 0L;
       } else {
         createTimeBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000100;
       onChanged();
       return this;
     }
@@ -1427,7 +1563,7 @@ private static final long serialVersionUID = 0L;
       } else {
         createTimeBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000100;
       onChanged();
       return this;
     }
@@ -1436,7 +1572,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeCreateTime(org.mojolang.mojo.core.Timestamp value) {
       if (createTimeBuilder_ == null) {
-        if (((bitField0_ & 0x00000080) != 0) &&
+        if (((bitField0_ & 0x00000100) != 0) &&
           createTime_ != null &&
           createTime_ != org.mojolang.mojo.core.Timestamp.getDefaultInstance()) {
           getCreateTimeBuilder().mergeFrom(value);
@@ -1447,7 +1583,7 @@ private static final long serialVersionUID = 0L;
         createTimeBuilder_.mergeFrom(value);
       }
       if (createTime_ != null) {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
       }
       return this;
@@ -1456,7 +1592,7 @@ private static final long serialVersionUID = 0L;
      * <code>.mojo.core.Timestamp create_time = 100;</code>
      */
     public Builder clearCreateTime() {
-      bitField0_ = (bitField0_ & ~0x00000080);
+      bitField0_ = (bitField0_ & ~0x00000100);
       createTime_ = null;
       if (createTimeBuilder_ != null) {
         createTimeBuilder_.dispose();
@@ -1469,7 +1605,7 @@ private static final long serialVersionUID = 0L;
      * <code>.mojo.core.Timestamp create_time = 100;</code>
      */
     public org.mojolang.mojo.core.Timestamp.Builder getCreateTimeBuilder() {
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000100;
       onChanged();
       return getCreateTimeFieldBuilder().getBuilder();
     }
@@ -1509,7 +1645,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the updateTime field is set.
      */
     public boolean hasUpdateTime() {
-      return ((bitField0_ & 0x00000100) != 0);
+      return ((bitField0_ & 0x00000200) != 0);
     }
     /**
      * <code>.mojo.core.Timestamp update_time = 101;</code>
@@ -1534,7 +1670,7 @@ private static final long serialVersionUID = 0L;
       } else {
         updateTimeBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000100;
+      bitField0_ |= 0x00000200;
       onChanged();
       return this;
     }
@@ -1548,7 +1684,7 @@ private static final long serialVersionUID = 0L;
       } else {
         updateTimeBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000100;
+      bitField0_ |= 0x00000200;
       onChanged();
       return this;
     }
@@ -1557,7 +1693,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeUpdateTime(org.mojolang.mojo.core.Timestamp value) {
       if (updateTimeBuilder_ == null) {
-        if (((bitField0_ & 0x00000100) != 0) &&
+        if (((bitField0_ & 0x00000200) != 0) &&
           updateTime_ != null &&
           updateTime_ != org.mojolang.mojo.core.Timestamp.getDefaultInstance()) {
           getUpdateTimeBuilder().mergeFrom(value);
@@ -1568,7 +1704,7 @@ private static final long serialVersionUID = 0L;
         updateTimeBuilder_.mergeFrom(value);
       }
       if (updateTime_ != null) {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
       }
       return this;
@@ -1577,7 +1713,7 @@ private static final long serialVersionUID = 0L;
      * <code>.mojo.core.Timestamp update_time = 101;</code>
      */
     public Builder clearUpdateTime() {
-      bitField0_ = (bitField0_ & ~0x00000100);
+      bitField0_ = (bitField0_ & ~0x00000200);
       updateTime_ = null;
       if (updateTimeBuilder_ != null) {
         updateTimeBuilder_.dispose();
@@ -1590,7 +1726,7 @@ private static final long serialVersionUID = 0L;
      * <code>.mojo.core.Timestamp update_time = 101;</code>
      */
     public org.mojolang.mojo.core.Timestamp.Builder getUpdateTimeBuilder() {
-      bitField0_ |= 0x00000100;
+      bitField0_ |= 0x00000200;
       onChanged();
       return getUpdateTimeFieldBuilder().getBuilder();
     }

@@ -65,6 +65,9 @@ components:
         description:
           title: mojo.core.String
           type: string
+        hashKey:
+          title: mojo.core.String
+          type: string
         id:
           title: mojo.core.String
           type: string

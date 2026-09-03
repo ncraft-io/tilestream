@@ -69,6 +69,7 @@ GET /tilestream/v1/layers
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
@@ -93,6 +94,7 @@ POST /tilestream/v1/layers
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
@@ -109,6 +111,7 @@ POST /tilestream/v1/layers
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
@@ -139,6 +142,7 @@ PUT /tilestream/v1/layers/{id}
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
@@ -176,6 +180,7 @@ GET /tilestream/v1/layers/{layer}
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
@@ -470,6 +475,7 @@ GET /tilestream/v1/layers:batch
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
@@ -500,6 +506,7 @@ PUT /tilestream/v1/layers:batch
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
@@ -535,6 +542,7 @@ POST /tilestream/v1/layers:batch
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |
@@ -557,6 +565,7 @@ POST /tilestream/v1/layers:batch
 | `templated` | `boolean` |  | N |  |
 | `config` | `mojo.core.Object` |  | N |  | Object type |
 | `description` | `string` |  | N |  |
+| `hashKey` | `string` |  | N |  |
 | `originalId` | `string` |  | N |  | copied layer from original layer id |
 | `createTime` | `string` | `Timestamp` | N |  |  |
 | `updateTime` | `string` | `Timestamp` | N |  |  |

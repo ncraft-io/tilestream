@@ -79,7 +79,7 @@ func (s *Scatter) StopWriting(ctx context.Context) error {
 	return nil
 }
 
-func (s *Scatter) WriteTile(ctx context.Context, x, y, level int32, tile []byte) error {
+func (s *Scatter) WriteTile(ctx context.Context, x, y, level int32, tile []byte, options core.Options) error {
 	token := getToken(x, y, level)
 	return s.Store.Put(ctx, []byte(token), tile)
 }

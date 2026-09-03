@@ -41,16 +41,16 @@ public final class LayerProto {
     java.lang.String[] descriptorData = {
       "\n\026tilestream/layer.proto\022\ntilestream\032\024mo" +
       "jo/core/time.proto\032\025mojo/core/value.prot" +
-      "o\032\017mojo/mojo.proto\"\353\001\n\005Layer\022\n\n\002id\030\001 \001(\t" +
+      "o\032\017mojo/mojo.proto\"\375\001\n\005Layer\022\n\n\002id\030\001 \001(\t" +
       "\022\014\n\004name\030\002 \001(\t\022\014\n\004type\030\003 \001(\t\022\021\n\ttemplate" +
       "d\030\004 \001(\010\022\'\n\006config\030\005 \001(\0132\021.mojo.core.Obje" +
-      "ctB\004\350\325$\001\022\023\n\013description\030\006 \001(\t\022\023\n\013origina" +
-      "l_id\030\n \001(\t\022)\n\013create_time\030d \001(\0132\024.mojo.c" +
-      "ore.Timestamp\022)\n\013update_time\030e \001(\0132\024.moj" +
-      "o.core.TimestampBb\n\024io.ncraft.tilestream" +
-      "B\nLayerProtoP\001Z<github.com/ncraft-io/til" +
-      "estream/go/pkg/tilestream;tilestreamb\006pr" +
-      "oto3"
+      "ctB\004\350\325$\001\022\023\n\013description\030\006 \001(\t\022\020\n\010hash_ke" +
+      "y\030\t \001(\t\022\023\n\013original_id\030\n \001(\t\022)\n\013create_t" +
+      "ime\030d \001(\0132\024.mojo.core.Timestamp\022)\n\013updat" +
+      "e_time\030e \001(\0132\024.mojo.core.TimestampBb\n\024io" +
+      ".ncraft.tilestreamB\nLayerProtoP\001Z<github" +
+      ".com/ncraft-io/tilestream/go/pkg/tilestr" +
+      "eam;tilestreamb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -64,7 +64,7 @@ public final class LayerProto {
     internal_static_tilestream_Layer_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_tilestream_Layer_descriptor,
-        new java.lang.String[] { "Id", "Name", "Type", "Templated", "Config", "Description", "OriginalId", "CreateTime", "UpdateTime", });
+        new java.lang.String[] { "Id", "Name", "Type", "Templated", "Config", "Description", "HashKey", "OriginalId", "CreateTime", "UpdateTime", });
     descriptor.resolveAllFeaturesImmutable();
     org.mojolang.mojo.core.TimeProto.getDescriptor();
     org.mojolang.mojo.core.ValueProto.getDescriptor();

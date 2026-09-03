@@ -93,7 +93,7 @@ func (m *Mbtiles) StopWriting(ctx context.Context) error {
 	return nil
 }
 
-func (m *Mbtiles) WriteTile(ctx context.Context, x, y, z int32, tile []byte) error {
+func (m *Mbtiles) WriteTile(ctx context.Context, x, y, z int32, tile []byte, options core.Options) error {
 	if layer := m.getLayer(ctx); len(layer) > 0 {
 		return GetTilesModel(m.Config, layer).CreateTile(ctx, &Tiles{
 			ZoomLevel:  z,
