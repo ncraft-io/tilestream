@@ -37,7 +37,7 @@ func findMbtiles(config *Config, layer string) string {
 	if len(file) == 0 {
 		return path.Join(config.Paths[0], layer+".mbtiles")
 	}
-	return ""
+	return file
 }
 
 func NewMetadataModel(config *Config, layer string) *MetadataModel {

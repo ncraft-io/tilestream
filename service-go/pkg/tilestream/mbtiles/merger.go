@@ -46,7 +46,7 @@ func Merge(src string, dest string) error {
 						return err
 					}
 					if len(tile) > 0 {
-						err = d.WriteTile(context.Background(), x, y, l, tile)
+						err = d.WriteTile(context.Background(), x, y, l, tile, nil)
 						if err != nil {
 							return err
 						}

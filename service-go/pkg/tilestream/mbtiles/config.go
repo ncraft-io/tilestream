@@ -1,6 +1,7 @@
 package mbtiles
 
 type Config struct {
-	Paths []string `json:"paths"`
-	Layer string   `json:"layer"`
+	Paths  []string `json:"paths"`
+	Layer  string   `json:"layer"`
+	Format string   `json:"format"`
 }

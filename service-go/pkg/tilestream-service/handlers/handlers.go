@@ -11,6 +11,7 @@ import (
 
 	ts "github.com/ncraft-io/tilestream/service-go/pkg/tilestream"
 
+	_ "github.com/ncraft-io/tilestream/service-go/pkg/tilestream/mbtiles"
 	_ "github.com/ncraft-io/tilestream/service-go/pkg/tilestream/pgsql"
 	_ "github.com/ncraft-io/tilestream/service-go/pkg/tilestream/postgis"
 

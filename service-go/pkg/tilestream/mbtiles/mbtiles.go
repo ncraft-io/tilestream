@@ -68,7 +68,7 @@ func (m *Mbtiles) Tile(ctx context.Context, x, y, level int32) ([]byte, core.Opt
 		if err != nil {
 			return nil, nil, nil
 		}
-		return t.TileData, nil, nil
+		return t.TileData, core.NewOptions("Format", m.Config.Format), nil
 	}
 	return nil, nil, nil
 }
