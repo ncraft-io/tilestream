@@ -3,32 +3,31 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+
 	jsoniter "github.com/json-iterator/go"
 	"github.com/ncraft-io/tilestream/service-go/pkg/tilestream/mbtiles"
 	"github.com/urfave/cli/v2"
-	"log"
-	"os"
 )
 
-// merge --src  --dest
-// info
-func main() {
-	app := &cli.App{
+func newApp() *cli.App {
+	return &cli.App{
 		Name:  "mbtiles",
 		Usage: "mbtiles utility",
 		Commands: []*cli.Command{
 			{
 				Name:    "merge",
 				Aliases: []string{"m"},
-				Usage:   "merge mbtiles",
+				Usage:   "merge an MBTiles file or directory recursively (later paths overwrite duplicate tiles)",
 				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "src", Aliases: []string{"s"}},
-					&cli.StringFlag{Name: "dest", Aliases: []string{"d"}},
+					&cli.StringFlag{Name: "src", Aliases: []string{"s"}, Required: true, Usage: "source MBTiles file or directory"},
+					&cli.StringFlag{Name: "dest", Aliases: []string{"d"}, Required: true, Usage: "destination .mbtiles file"},
 				},
 				Action: func(ctx *cli.Context) error {
 					src := ctx.String("src")
 					dest := ctx.String("dest")
-					return mbtiles.Merge(src, dest)
+					return mbtiles.MergeContext(ctx.Context, src, dest)
 				},
 			},
 			{
@@ -52,7 +51,10 @@ func main() {
 		},
 	}
 
-	if err := app.Run(os.Args); err != nil {
+}
+
+func main() {
+	if err := newApp().Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }

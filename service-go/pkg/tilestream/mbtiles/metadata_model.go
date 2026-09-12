@@ -2,78 +2,66 @@ package mbtiles
 
 import (
 	"context"
+	"fmt"
+	"sync"
+
 	"github.com/mojo-lang/mojo/go/pkg/mojo/db"
-	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"os"
-	"path"
-	"sync"
 )
 
 var mm map[string]*MetadataModel = make(map[string]*MetadataModel)
 var mmLock sync.Mutex
 
 type MetadataModel struct {
-	DB     *db.DB
-	Config *Config
-}
-
-func findMbtiles(config *Config, layer string) string {
-	var file string
-	for _, p := range config.Paths {
-		f := path.Join(p, layer+".mbtiles")
-		stat, err := os.Stat(f)
-		if err != nil || os.IsNotExist(err) {
-			continue
-		}
-		if stat.IsDir() {
-			continue
-		}
-		file = f
-		break
-	}
-	if len(file) == 0 {
-		return path.Join(config.Paths[0], layer+".mbtiles")
-	}
-	return file
+	DB        *db.DB
+	Config    *Config
+	err       error
+	writeOnce sync.Once
+	writeErr  error
 }
 
 func NewMetadataModel(config *Config, layer string) *MetadataModel {
-	if config == nil || len(config.Paths) == 0 || len(layer) == 0 {
-		return nil
-	}
-
-	file := findMbtiles(config, layer)
-	DB, err := gorm.Open(sqlite.Open(file), &gorm.Config{})
+	file, err := modelFile(config, layer)
 	if err != nil {
-		logs.Warnw("failed to open the mbtiles files", "file", file, "error", err)
-		return nil
+		return &MetadataModel{Config: config, err: err}
 	}
-	return &MetadataModel{
-		DB: &db.DB{
-			DB:     DB,
-			Config: nil,
-		},
-		Config: config,
-	}
+	database, err := openModelDB(file)
+	return &MetadataModel{DB: database, Config: config, err: err}
 }
 
 func GetMetadataModel(config *Config, layer string) *MetadataModel {
+	file, err := modelFile(config, layer)
+	if err != nil {
+		return &MetadataModel{Config: config, err: err}
+	}
 	mmLock.Lock()
 	defer mmLock.Unlock()
-
-	if m, ok := mm[layer]; ok {
-		return m
+	if model, ok := mm[file]; ok {
+		return model
 	}
+	model := NewMetadataModel(config, layer)
+	if model.err == nil {
+		mm[file] = model
+	}
+	return model
+}
 
-	m := NewMetadataModel(config, layer)
-	mm[layer] = m
-	return m
+func (m *MetadataModel) prepareWrite() error {
+	if m == nil {
+		return fmt.Errorf("invalid MBTiles model")
+	}
+	if m.err != nil {
+		return m.err
+	}
+	m.writeOnce.Do(func() { m.writeErr = initializeModelSchema(m.DB.DB) })
+	return m.writeErr
 }
 
 func (m *MetadataModel) CreateMetadata(ctx context.Context, data ...*Metadata) error {
+	if err := m.prepareWrite(); err != nil {
+		return err
+	}
 	length := len(data)
 	var executionResult *gorm.DB
 
@@ -89,7 +77,14 @@ func (m *MetadataModel) CreateMetadata(ctx context.Context, data ...*Metadata) e
 }
 
 func (m *MetadataModel) ListMetadata(ctx context.Context) ([]*Metadata, error) {
+	if m == nil {
+		return nil, fmt.Errorf("invalid MBTiles model")
+	}
+	if m.err != nil {
+		return nil, m.err
+	}
 	var data []*Metadata
 	tx := m.DB.DB.WithContext(ctx)
-	return data, tx.Find(&data).Error
+	err := tx.Find(&data).Error
+	return data, err
 }

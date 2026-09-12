@@ -2,56 +2,66 @@ package mbtiles
 
 import (
 	"context"
+	"fmt"
+	"sync"
+
 	"github.com/mojo-lang/mojo/go/pkg/mojo/db"
-	"github.com/ncraft-io/ncraft/go/pkg/ncraft/logs"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"sync"
 )
 
 var mt map[string]*TilesModel = make(map[string]*TilesModel)
 var mtLock sync.Mutex
 
 type TilesModel struct {
-	DB     *db.DB
-	Config *Config
+	DB        *db.DB
+	Config    *Config
+	err       error
+	writeOnce sync.Once
+	writeErr  error
 }
 
 func NewTilesModel(config *Config, layer string) *TilesModel {
-	if config == nil || len(config.Paths) == 0 || len(layer) == 0 {
-		return nil
-	}
-
-	file := findMbtiles(config, layer)
-	DB, err := gorm.Open(sqlite.Open(file), &gorm.Config{})
+	file, err := modelFile(config, layer)
 	if err != nil {
-		logs.Warnw("failed to open the mbtiles files", "file", file, "error", err)
-		return nil
+		return &TilesModel{Config: config, err: err}
 	}
-	return &TilesModel{
-		DB: &db.DB{
-			DB:     DB,
-			Config: nil,
-		},
-		Config: config,
-	}
+	database, err := openModelDB(file)
+	return &TilesModel{DB: database, Config: config, err: err}
 }
 
 func GetTilesModel(config *Config, layer string) *TilesModel {
+	file, err := modelFile(config, layer)
+	if err != nil {
+		return &TilesModel{Config: config, err: err}
+	}
 	mtLock.Lock()
 	defer mtLock.Unlock()
-
-	if m, ok := mt[layer]; ok {
-		return m
+	if model, ok := mt[file]; ok {
+		return model
 	}
+	model := NewTilesModel(config, layer)
+	if model.err == nil {
+		mt[file] = model
+	}
+	return model
+}
 
-	m := NewTilesModel(config, layer)
-	mt[layer] = m
-	return m
+func (t *TilesModel) prepareWrite() error {
+	if t == nil {
+		return fmt.Errorf("invalid MBTiles model")
+	}
+	if t.err != nil {
+		return t.err
+	}
+	t.writeOnce.Do(func() { t.writeErr = initializeModelSchema(t.DB.DB) })
+	return t.writeErr
 }
 
 func (t *TilesModel) CreateTile(ctx context.Context, tiles ...*Tiles) error {
+	if err := t.prepareWrite(); err != nil {
+		return err
+	}
 	length := len(tiles)
 	var executionResult *gorm.DB
 
@@ -67,6 +77,12 @@ func (t *TilesModel) CreateTile(ctx context.Context, tiles ...*Tiles) error {
 }
 
 func (t *TilesModel) GetTile(ctx context.Context, x, y, level int32) (*Tiles, error) {
+	if t == nil {
+		return nil, fmt.Errorf("invalid MBTiles model")
+	}
+	if t.err != nil {
+		return nil, t.err
+	}
 	tiles := &Tiles{}
 	tx := t.DB.DB.WithContext(ctx)
 	return tiles, tx.Where("zoom_level=? and tile_column=? and tile_row=?", level, x, y).Find(tiles).Error
