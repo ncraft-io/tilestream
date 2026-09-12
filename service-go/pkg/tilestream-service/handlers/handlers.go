@@ -159,7 +159,7 @@ func (s tilestreamServer) CreateLayer(ctx context.Context, in *pb.CreateLayerReq
 	}
 
 	if len(in.Layer.OriginalId) == 0 {
-		if layer, _ := model.GetLayer().Get(ctx, in.Layer.Name); layer != nil {
+		if layer, _ := model.GetLayerModel().Get(ctx, in.Layer.Name); layer != nil {
 			in.Layer.Id = layer.Id
 			in.Layer.CreateTime = layer.CreateTime
 		}
@@ -175,7 +175,7 @@ func (s tilestreamServer) CreateLayer(ctx context.Context, in *pb.CreateLayerReq
 	in.Layer.UpdateTime = core.Now()
 	in.Layer.HashKey = in.Layer.VTileHash()
 
-	if _, err := model.GetLayer().Create(ctx, in.Layer); err != nil {
+	if _, err := model.GetLayerModel().Create(ctx, in.Layer); err != nil {
 		return nil, core.NewInternalError("failed to save the layer to database, error: %s", err.Error())
 	}
 
@@ -205,7 +205,7 @@ func (s tilestreamServer) UpdateLayer(ctx context.Context, in *pb.UpdateLayerReq
 	}
 
 	//var dbLayer *tilestream.Layer
-	if l, err := model.NewLayer().Get(ctx, in.Layer.Id); err != nil {
+	if l, err := model.GetLayerModel().Get(ctx, in.Layer.Id); err != nil {
 		return nil, core.NewInvalidArgumentError("the layer id (%s) is not found", in.Layer.Id)
 	} else {
 		//dbLayer = l
@@ -222,7 +222,7 @@ func (s tilestreamServer) UpdateLayer(ctx context.Context, in *pb.UpdateLayerReq
 		}
 		in.Layer.UpdateTime = core.Now()
 		in.Layer.HashKey = in.Layer.VTileHash()
-		if _, err := model.GetLayer().Update(ctx, in.Layer); err != nil {
+		if _, err := model.GetLayerModel().Update(ctx, in.Layer); err != nil {
 			return nil, core.NewInternalError("failed to save the layer to database, error: %s", err.Error())
 		}
 
@@ -248,7 +248,7 @@ func (s tilestreamServer) DeleteLayer(ctx context.Context, in *pb.DeleteLayerReq
 	//	instance.Delete(in.Layer)
 	//}
 
-	if _, err := model.NewLayer().Delete(ctx, in.Layer); err != nil {
+	if _, err := model.GetLayerModel().Delete(ctx, in.Layer); err != nil {
 		return nil, core.NewInvalidArgumentError("failed to delete the layer (%s)", in.Layer)
 	}
 
@@ -261,7 +261,7 @@ func (s tilestreamServer) GetLayer(ctx context.Context, in *pb.GetLayerRequest) 
 		return nil, core.NewInvalidArgumentError("the layer id is empty")
 	}
 
-	if layer, err := model.GetLayer().Get(ctx, in.Layer); err != nil {
+	if layer, err := model.GetLayerModel().Get(ctx, in.Layer); err != nil {
 		return nil, core.NewInvalidArgumentError("the layer id (%s) is not found", in.Layer)
 	} else {
 		return layer, nil
@@ -304,7 +304,7 @@ func (s tilestreamServer) BatchUpdateLayer(ctx context.Context, in *pb.BatchUpda
 
 	for _, layer := range in.Layers {
 		layer.HashKey = layer.VTileHash()
-		_, err := model.GetLayer().Update(ctx, layer)
+		_, err := model.GetLayerModel().Update(ctx, layer)
 		if err != nil {
 			return nil, core.NewInternalError("failed to update layers (%v) err: %s", ids, err.Error())
 		}
@@ -319,7 +319,7 @@ func (s tilestreamServer) BatchGetLayers(ctx context.Context, in *pb.BatchGetLay
 		return nil, core.NewInvalidArgumentError("the layers is empty")
 	}
 
-	layers, err := model.GetLayer().BatchGet(ctx, in.Layers)
+	layers, err := model.GetLayerModel().BatchGet(ctx, in.Layers...)
 	if err != nil {
 		return nil, core.NewInternalError("failed to get layers (%v) err: %s", in.Layers, err.Error())
 	}
@@ -358,7 +358,7 @@ func (s tilestreamServer) BatchCreateLayer(ctx context.Context, in *pb.BatchCrea
 		}
 
 		if len(layer.OriginalId) == 0 {
-			if l, _ := model.NewLayer().Get(ctx, layer.Name); l != nil {
+			if l, _ := model.GetLayerModel().Get(ctx, layer.Name); l != nil {
 				layer.Id = l.Id
 				layer.CreateTime = l.CreateTime
 			}
@@ -375,7 +375,7 @@ func (s tilestreamServer) BatchCreateLayer(ctx context.Context, in *pb.BatchCrea
 		layer.UpdateTime = core.Now()
 	}
 
-	if _, err := model.GetLayer().Create(ctx, in.Layers...); err != nil {
+	if _, err := model.GetLayerModel().BatchCreate(ctx, in.Layers...); err != nil {
 		return nil, core.NewInternalError("failed to create the layer to database, error: %s", err.Error())
 	}
 

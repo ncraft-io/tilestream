@@ -122,7 +122,6 @@ require (
 	github.com/mr-tron/base58 v1.2.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nacos-group/nacos-sdk-go/v2 v2.2.7 // indirect
-	github.com/ncraft-io/go-evaluate v0.0.0-20221204034007-df47db0019f2 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/phpdave11/gofpdf v1.4.2 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect

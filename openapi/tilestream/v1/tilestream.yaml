@@ -360,6 +360,11 @@ components:
       properties:
         bounds:
           $ref: '#/components/schemas/mojo.geom.BoundingBox'
+        clusters:
+          items:
+            $ref: '#/components/schemas/tilestream.providers.postgis.Config.Cluster'
+          title: mojo.core.Array
+          type: array
         debug:
           title: mojo.core.Bool
           type: boolean
@@ -381,6 +386,36 @@ components:
           title: mojo.core.Int64
           type: integer
       title: tilestream.providers.postgis.Config
+      type: object
+    tilestream.providers.postgis.Config.Cluster:
+      description: ""
+      properties:
+        eps:
+          format: Float32
+          title: mojo.core.Float32
+          type: number
+        groupBys:
+          description: group by fields
+          items:
+            title: mojo.core.String
+            type: string
+          title: mojo.core.Array
+          type: array
+        maxZoom:
+          description: optional, recommend max zoom
+          format: Int64
+          title: mojo.core.Int64
+          type: integer
+        minPoints:
+          format: Int32
+          title: mojo.core.Int32
+          type: integer
+        minZoom:
+          description: optional, recommend min zoom
+          format: Int64
+          title: mojo.core.Int64
+          type: integer
+      title: tilestream.providers.postgis.Config.Cluster
       type: object
     tilestream.providers.postgis.Config.Provider:
       description: ""

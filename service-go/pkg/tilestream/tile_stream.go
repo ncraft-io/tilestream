@@ -108,7 +108,7 @@ func NewTileStream(name string) TileStream {
 		}
 	}
 
-	if layer, err := model.GetLayer().Get(context.Background(), name); err == nil {
+	if layer, err := model.GetLayerModel().Get(context.Background(), name); err == nil {
 		options := layer.Config.ToOptions()
 		if options != nil {
 			return LoadTileStream(layer.Type, options)

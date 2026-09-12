@@ -69,5 +69,5 @@ func (t *TilesModel) CreateTile(ctx context.Context, tiles ...*Tiles) error {
 func (t *TilesModel) GetTile(ctx context.Context, x, y, level int32) (*Tiles, error) {
 	tiles := &Tiles{}
 	tx := t.DB.DB.WithContext(ctx)
-	return tiles, tx.Find(tiles).Error
+	return tiles, tx.Where("zoom_level=? and tile_column=? and tile_row=?", level, x, y).Find(tiles).Error
 }

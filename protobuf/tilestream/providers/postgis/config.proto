@@ -30,6 +30,14 @@ message Config {
         Config.Sql sql = 4;
     }
 
+    message Cluster {
+        float eps = 1;
+        int32 min_points = 2;
+        repeated string group_bys = 3;
+        int64 min_zoom = 10;
+        int64 max_zoom = 11;
+    }
+
     bool debug = 1;
     string name = 2;
     int64 min_zoom = 4;
@@ -37,4 +45,5 @@ message Config {
     mojo.geom.BoundingBox bounds = 6;
     int64 tile_buffer = 7;
     Provider provider = 10;
+    repeated Cluster clusters = 11;
 }

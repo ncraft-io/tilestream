@@ -1,0 +1,38 @@
+{
+    "title": "tilestream.providers.postgis.Config.Cluster",
+    "description": "",
+    "type": "object",
+    "properties": {
+        "eps": {
+            "title": "mojo.core.Float32",
+            "type": "number",
+            "format": "Float32"
+        },
+        "groupBys": {
+            "title": "mojo.core.Array",
+            "description": "group by fields",
+            "type": "array",
+            "items": {
+                "title": "mojo.core.String",
+                "type": "string"
+            }
+        },
+        "maxZoom": {
+            "title": "mojo.core.Int64",
+            "description": "optional, recommend max zoom",
+            "type": "integer",
+            "format": "Int64"
+        },
+        "minPoints": {
+            "title": "mojo.core.Int32",
+            "type": "integer",
+            "format": "Int32"
+        },
+        "minZoom": {
+            "title": "mojo.core.Int64",
+            "description": "optional, recommend min zoom",
+            "type": "integer",
+            "format": "Int64"
+        }
+    }
+}

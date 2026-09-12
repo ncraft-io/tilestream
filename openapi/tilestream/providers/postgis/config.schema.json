@@ -6,6 +6,13 @@
         "bounds": {
             "$ref": "#/components/schemas/mojo.geom.BoundingBox"
         },
+        "clusters": {
+            "title": "mojo.core.Array",
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/tilestream.providers.postgis.Config.Cluster"
+            }
+        },
         "debug": {
             "title": "mojo.core.Bool",
             "type": "boolean"
